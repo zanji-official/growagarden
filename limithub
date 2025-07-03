@@ -1,1 +1,1 @@
-loadstring(game:HttpGet(('https://raw.githubusercontent.com/FakeModz/LimitHub/refs/heads/main/LimitHub_Loader.lua')))()
+loadstring(game:HttpGet(('https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/lh')))()
