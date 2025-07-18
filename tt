@@ -468,10 +468,11 @@ local function monitorTool()
             end
             if tool and tool.Name:find("Age") then
                 local petName = tool.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
-                -- Check if petName contains any whitelisted pet as a substring
+                -- Case-insensitive substring check for whitelisted pets
                 local isValid = false
+                local petNameLower = petName:lower()
                 for validPet, _ in pairs(WHITELISTED_PETS) do
-                    if petName:find(validPet, 1, true) then
+                    if petNameLower:find(validPet:lower(), 1, true) then
                         isValid = true
                         break
                     end
