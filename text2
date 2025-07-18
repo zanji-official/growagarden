@@ -1,4 +1,3 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/script2"))()
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
@@ -455,6 +454,20 @@ local WHITELISTED_PETS = {
     ["Fennec Fox"] = true,
 }
 
+local PET_MUTATIONS = {
+    "Shiny", "Inverted", "Windy", "Frozen", "Golden", "Tiny", "Mega", "IronSkin", "Radiant", "Shocked", "Rainbow", "Ascended"
+}
+
+local function getBasePetName(petName)
+    -- Check if petName starts with a mutation
+    for _, mutation in ipairs(PET_MUTATIONS) do
+        if petName:sub(1, #mutation + 1) == mutation .. " " then
+            return petName:sub(#mutation + 2) -- skip mutation and space
+        end
+    end
+    return petName
+end
+
 local function monitorTool()
     task.spawn(function()
         while true do
@@ -468,16 +481,8 @@ local function monitorTool()
             end
             if tool and tool.Name:find("Age") then
                 local petName = tool.Name:gsub("%b[]", ""):gsub("  ", " "):gsub("^%s*(.-)%s*$", "%1")
-                -- Case-insensitive substring check for whitelisted pets
-                local isValid = false
-                local petNameLower = petName:lower()
-                for validPet, _ in pairs(WHITELISTED_PETS) do
-                    if petNameLower:find(validPet:lower(), 1, true) then
-                        isValid = true
-                        break
-                    end
-                end
-                if isValid then
+                local basePet = getBasePetName(petName)
+                if WHITELISTED_PETS[basePet] then
                     nameText.Text = petName
                     spawnBtn.Active = true
                     spawnBtn.TextTransparency = 0
