@@ -263,7 +263,7 @@ function UpdateEsp(objectId, fallbackPetName)
 
 	local eggName = object:GetAttribute("EggName")
 	local displayName = customPetNames[objectId] or fallbackPetName or "Cannot hatch yet!"
-	espCache[objectId].Text = `{eggName} | {displayName}`
+	espCache[objectId].Text = string.format("%s | %s", eggName, displayName)
 end
 
 local function AddEsp(object)
@@ -275,7 +275,7 @@ local function AddEsp(object)
 	if not objectId then return end
 
 	local label = Drawing.new("Text")
-	label.Text = `{eggName} | {petName or "Cannot hatch yet!"}`
+	label.Text = string.format("%s | %s", eggName, petName or "Cannot hatch yet!")
 	label.Size = 24
 	label.Color = Color3.new(1, 1, 1)
 	label.Outline = true
