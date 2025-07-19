@@ -1,0 +1,406 @@
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+repeat task.wait() until player and player.Character
+
+-- GUI Setup
+local gui = Instance.new("ScreenGui", CoreGui)
+gui.Name = "ZanjiPetLevelUp"
+gui.ResetOnSpawn = false
+gui.IgnoreGuiInset = true
+gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Main Frame
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 240, 0, 140)
+main.Position = UDim2.new(0.5, -120, 0.5, -70)
+main.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
+main.Active = true
+main.Draggable = true
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
+local stroke = Instance.new("UIStroke", main)
+stroke.Color = Color3.fromRGB(80, 200, 180)
+stroke.Thickness = 2
+
+-- Header
+local header = Instance.new("Frame", main)
+header.Size = UDim2.new(1, 0, 0, 35)
+header.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+Instance.new("UICorner", header)
+
+local title = Instance.new("TextLabel", header)
+title.Size = UDim2.new(1, -40, 1, 0)
+title.Position = UDim2.new(0, 10, 0, 0)
+title.Text = "ZANJI: PET LEVEL UP"
+title.TextColor3 = Color3.fromRGB(220, 240, 235)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.BackgroundTransparency = 1
+title.TextXAlignment = Enum.TextXAlignment.Left
+
+local closeBtn = Instance.new("TextButton", header)
+closeBtn.Text = "X"
+closeBtn.Size = UDim2.new(0, 20, 0, 20)
+closeBtn.Position = UDim2.new(1, -30, 0, 8)
+closeBtn.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+closeBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.TextSize = 13
+Instance.new("UICorner", closeBtn)
+closeBtn.MouseButton1Click:Connect(function() gui:Destroy() end)
+
+-- Remove minimizeBtn, add infoBtn styled like eggrandomizer.lua
+local infoBtn = Instance.new("TextButton", header)
+infoBtn.Size = UDim2.new(0, 20, 0, 20)
+infoBtn.Position = UDim2.new(1, -55, 0, 8)
+infoBtn.BackgroundColor3 = Color3.fromRGB(120, 220, 210)
+infoBtn.Text = "?"
+infoBtn.Font = Enum.Font.GothamBold
+infoBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
+infoBtn.TextSize = 13
+Instance.new("UICorner", infoBtn)
+infoBtn.MouseEnter:Connect(function()
+    infoBtn.BackgroundColor3 = Color3.fromRGB(180, 240, 230)
+end)
+infoBtn.MouseLeave:Connect(function()
+    infoBtn.BackgroundColor3 = Color3.fromRGB(120, 220, 210)
+end)
+
+-- Floating restore 'Z' button
+local restoreBtn = Instance.new("TextButton", gui)
+restoreBtn.Size = UDim2.new(0, 48, 0, 48)
+restoreBtn.Position = UDim2.new(0, 15, 0.5, -32)
+restoreBtn.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+restoreBtn.Text = "Z"
+restoreBtn.Font = Enum.Font.FredokaOne
+restoreBtn.TextColor3 = Color3.fromRGB(80, 200, 180)
+restoreBtn.TextSize = 40
+restoreBtn.Visible = false
+Instance.new("UICorner", restoreBtn).CornerRadius = UDim.new(1, 0)
+restoreBtn.Active = true
+restoreBtn.Draggable = true
+restoreBtn.ClipsDescendants = true
+local restoreGlow = Instance.new("UIStroke", restoreBtn)
+restoreGlow.Color = Color3.fromRGB(80, 200, 180)
+restoreGlow.Thickness = 1
+restoreGlow.Transparency = 0.15
+restoreGlow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+local particleFolder = Instance.new("Folder", restoreBtn)
+particleFolder.Name = "Particles"
+local function spawnRestoreParticle()
+    local particle = Instance.new("Frame")
+    particle.Size = UDim2.new(0, math.random(2, 6), 0, math.random(2, 6))
+    local maxX = 1 - (particle.Size.X.Offset / restoreBtn.Size.X.Offset)
+    local maxY = 1 - (particle.Size.Y.Offset / restoreBtn.Size.Y.Offset)
+    particle.Position = UDim2.new(math.random() * maxX, 0, math.random() * maxY, 0)
+    particle.BackgroundColor3 = Color3.fromRGB(
+        80 + math.random(-10, 10),
+        200 + math.random(-10, 10),
+        180 + math.random(-10, 10)
+    )
+    particle.BackgroundTransparency = 0.15
+    particle.BorderSizePixel = 0
+    particle.ZIndex = 10
+    particle.Parent = particleFolder
+    Instance.new("UICorner", particle).CornerRadius = UDim.new(1, 0)
+    local goal = {
+        Position = UDim2.new(math.random() * maxX, 0, math.random() * maxY, 0),
+        BackgroundTransparency = 1
+    }
+    local tween = TweenService:Create(particle, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goal)
+    tween:Play()
+    tween.Completed:Connect(function()
+        particle:Destroy()
+    end)
+end
+task.spawn(function()
+    while true do
+        if restoreBtn.Visible then
+            spawnRestoreParticle()
+            task.wait(0.08)
+        else
+            task.wait(0.2)
+        end
+    end
+end)
+infoBtn.MouseButton1Click:Connect(function()
+    if gui:FindFirstChild("InfoModal") then return end
+    local blur = Instance.new("BlurEffect")
+    blur.Size = 16
+    blur.Name = "ModalBlur"
+    blur.Parent = game:GetService("Lighting")
+    local modal = Instance.new("Frame", gui)
+    modal.Name = "InfoModal"
+    modal.Size = UDim2.new(0, 200, 0, 90)
+    modal.Position = UDim2.new(0.5, -100, 0.5, -45)
+    modal.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+    modal.Active = true
+    modal.ZIndex = 30
+    Instance.new("UICorner", modal).CornerRadius = UDim.new(0, 8)
+    local modalStroke = Instance.new("UIStroke", modal)
+    modalStroke.Color = Color3.fromRGB(80, 200, 180)
+    modalStroke.Thickness = 2
+    local titleBar = Instance.new("Frame", modal)
+    titleBar.Size = UDim2.new(1, 0, 0, 22)
+    titleBar.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
+    Instance.new("UICorner", titleBar)
+    local titleLabel = Instance.new("TextLabel", titleBar)
+    titleLabel.Size = UDim2.new(1, -24, 1, 0)
+    titleLabel.Position = UDim2.new(0, 8, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = "ZANJI: PET LEVEL UP"
+    titleLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 13
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    local closeBtn2 = Instance.new("TextButton", titleBar)
+    closeBtn2.Size = UDim2.new(0, 18, 0, 18)
+    closeBtn2.Position = UDim2.new(1, -20, 0, 2)
+    closeBtn2.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+    closeBtn2.TextColor3 = Color3.fromRGB(24, 34, 38)
+    closeBtn2.Text = "✖"
+    closeBtn2.Font = Enum.Font.GothamBold
+    closeBtn2.TextSize = 13
+    Instance.new("UICorner", closeBtn2)
+    closeBtn2.MouseEnter:Connect(function()
+        closeBtn2.BackgroundColor3 = Color3.fromRGB(120, 220, 210)
+    end)
+    closeBtn2.MouseLeave:Connect(function()
+        closeBtn2.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+    end)
+    closeBtn2.MouseButton1Click:Connect(function()
+        if blur then blur:Destroy() end
+        if modal then modal:Destroy() end
+    end)
+    local infoLabel = Instance.new("TextLabel", modal)
+    infoLabel.Size = UDim2.new(1, -16, 1, -30)
+    infoLabel.Position = UDim2.new(0, 8, 0, 26)
+    infoLabel.BackgroundTransparency = 1
+    infoLabel.TextColor3 = Color3.fromRGB(220, 240, 235)
+    infoLabel.Text = "This script allows you to instantly level up your Divine pets.\n\nEquip a valid Divine pet and press the button below."
+    infoLabel.TextWrapped = true
+    infoLabel.Font = Enum.Font.Gotham
+    infoLabel.TextSize = 12
+    infoLabel.ZIndex = 31
+    infoLabel.TextStrokeTransparency = 0.5
+end)
+restoreBtn.MouseButton1Click:Connect(function()
+    main.Visible = true
+    restoreBtn.Visible = false
+end)
+
+-- Main Page
+local page = Instance.new("Frame", main)
+page.Size = UDim2.new(1, -20, 1, -75)
+page.Position = UDim2.new(0, 10, 0, 40)
+page.BackgroundColor3 = Color3.fromRGB(20, 28, 32)
+Instance.new("UICorner", page)
+
+-- Remove the userFrame, avatarImage, nameLabel, and errorSpace creation
+
+-- Notification Label (styled like test.lua, large and centered)
+local notificationLabel = Instance.new("TextLabel", main)
+notificationLabel.Name = "NotificationLabel"
+notificationLabel.Size = UDim2.new(1, -40, 0, 32)
+notificationLabel.Position = UDim2.new(0, 20, 0, header.Position.Y.Offset + header.Size.Y.Offset + 2)
+notificationLabel.BackgroundTransparency = 1
+notificationLabel.Text = ""
+notificationLabel.TextColor3 = Color3.fromRGB(220, 80, 80) -- default to error red
+notificationLabel.TextStrokeTransparency = 0.2
+notificationLabel.TextScaled = true
+notificationLabel.Font = Enum.Font.GothamBold
+notificationLabel.TextXAlignment = Enum.TextXAlignment.Center
+notificationLabel.TextYAlignment = Enum.TextYAlignment.Center
+notificationLabel.TextTransparency = 0
+notificationLabel.ZIndex = 3
+
+-- Level Up Button
+local levelUpBtn = Instance.new("TextButton", page)
+levelUpBtn.Name = "LevelUpButton"
+levelUpBtn.Size = UDim2.new(1, -20, 0, 40)
+-- Move levelUpBtn further downward to give space for error message
+levelUpBtn.Position = UDim2.new(0, 10, 1, -40)
+levelUpBtn.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+levelUpBtn.Text = "LEVEL UP 50 INSTANTLY"
+levelUpBtn.TextScaled = true
+levelUpBtn.Font = Enum.Font.GothamBold
+levelUpBtn.TextColor3 = Color3.fromRGB(24, 34, 38)
+levelUpBtn.AutoButtonColor = true
+levelUpBtn.TextTransparency = 0
+Instance.new("UICorner", levelUpBtn)
+
+-- Valid Pets List (keep from original)
+local validPets = {
+    "Raccoon",
+    "T-rex",
+    "Trex",
+    "Fennec Fox",
+    "Dragonfly",
+    "Butterfly",
+    "Disco Bee",
+    "Mimic Octopus",
+    "Spinosaurus",
+    "Queen Bee",
+    "Kitsune"
+}
+
+-- Loading UI (centered, animated bar, particles)
+local function showLoadingUI(callback)
+    local tempLoading = Instance.new("Frame", gui)
+    tempLoading.Size = UDim2.new(0, 260, 0, 110)
+    tempLoading.Position = UDim2.new(0.5, -130, 0.5, -55)
+    tempLoading.BackgroundColor3 = Color3.fromRGB(24, 34, 38)
+    tempLoading.ZIndex = 100
+    tempLoading.Active = true
+    tempLoading.AnchorPoint = Vector2.new(0, 0)
+    Instance.new("UICorner", tempLoading).CornerRadius = UDim.new(0, 12)
+    local stroke = Instance.new("UIStroke", tempLoading)
+    stroke.Color = Color3.fromRGB(80, 200, 180)
+    stroke.Thickness = 2
+    local particleFolder = Instance.new("Folder", tempLoading)
+    particleFolder.Name = "Particles"
+    local function spawnParticle()
+        local particle = Instance.new("Frame")
+        particle.Size = UDim2.new(0, math.random(2, 6), 0, math.random(2, 6))
+        local maxX = 1 - (particle.Size.X.Offset / tempLoading.Size.X.Offset)
+        local maxY = 1 - (particle.Size.Y.Offset / tempLoading.Size.Y.Offset)
+        particle.Position = UDim2.new(math.random() * maxX, 0, math.random() * maxY, 0)
+        particle.BackgroundColor3 = Color3.fromRGB(
+            80 + math.random(-10, 10),
+            200 + math.random(-10, 10),
+            180 + math.random(-10, 10)
+        )
+        particle.BackgroundTransparency = 0.15
+        particle.BorderSizePixel = 0
+        particle.ZIndex = 101
+        particle.Parent = particleFolder
+        Instance.new("UICorner", particle).CornerRadius = UDim.new(1, 0)
+        local goal = {
+            Position = UDim2.new(math.random() * maxX, 0, math.random() * maxY, 0),
+            BackgroundTransparency = 1
+        }
+        local tween = TweenService:Create(particle, TweenInfo.new(1.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), goal)
+        tween:Play()
+        tween.Completed:Connect(function()
+            particle:Destroy()
+        end)
+    end
+    task.spawn(function()
+        while tempLoading.Parent do
+            spawnParticle()
+            task.wait(0.08)
+        end
+    end)
+    local label = Instance.new("TextLabel", tempLoading)
+    label.Size = UDim2.new(1, -20, 0, 32)
+    label.Position = UDim2.new(0, 10, 0, 10)
+    label.Text = "Leveling Up Pet..."
+    label.TextColor3 = Color3.fromRGB(220, 240, 235)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 15
+    label.BackgroundTransparency = 1
+    label.TextXAlignment = Enum.TextXAlignment.Center
+    label.TextYAlignment = Enum.TextYAlignment.Center
+    local barBG = Instance.new("Frame", tempLoading)
+    barBG.Size = UDim2.new(0.85, 0, 0, 12)
+    barBG.Position = UDim2.new(0.075, 0, 0, 55)
+    barBG.BackgroundColor3 = Color3.fromRGB(28, 44, 48)
+    Instance.new("UICorner", barBG).CornerRadius = UDim.new(1, 0)
+    local bar = Instance.new("Frame", barBG)
+    bar.Size = UDim2.new(0, 0, 1, 0)
+    bar.BackgroundColor3 = Color3.fromRGB(80, 200, 180)
+    Instance.new("UICorner", bar).CornerRadius = UDim.new(1, 0)
+    local glow = Instance.new("UIStroke", bar)
+    glow.Color = Color3.fromRGB(120, 220, 210)
+    glow.Thickness = 2
+    glow.Transparency = 0.3
+    glow.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    local percent = Instance.new("TextLabel", tempLoading)
+    percent.Size = UDim2.new(0, 80, 0, 20)
+    percent.Position = UDim2.new(0.5, -40, 0, 75)
+    percent.Text = "0%"
+    percent.TextColor3 = Color3.fromRGB(220, 240, 235)
+    percent.Font = Enum.Font.GothamBold
+    percent.TextSize = 14
+    percent.BackgroundTransparency = 1
+    percent.TextXAlignment = Enum.TextXAlignment.Center
+    percent.TextYAlignment = Enum.TextYAlignment.Center
+    local totalTime = 10 -- seconds (10 seconds for leveling up)
+    local steps = 100
+    for i = 1, steps do
+        TweenService:Create(bar, TweenInfo.new(totalTime / steps), {
+            Size = UDim2.new(i / steps, 0, 1, 0)
+        }):Play()
+        percent.Text = i .. "%"
+        task.wait(totalTime / steps)
+    end
+    tempLoading:Destroy()
+    if callback then callback() end
+end
+
+-- Button Action: Level Up Pet
+levelUpBtn.MouseButton1Click:Connect(function()
+    local char = player.Character or player.CharacterAdded:Wait(10)
+    if not char then
+        notificationLabel.Text = "Error: Character not loaded"
+        notificationLabel.TextColor3 = Color3.fromRGB(220, 80, 80)
+        task.wait(3)
+        notificationLabel.Text = ""
+        return
+    end
+    local tool = char:FindFirstChildOfClass("Tool")
+    if tool then
+        local isValidPet = false
+        local petName = nil
+        for _, pet in ipairs(validPets) do
+            if string.match(tool.Name, "^" .. pet) then
+                isValidPet = true
+                petName = pet
+                break
+            end
+        end
+        if isValidPet then
+            notificationLabel.Text = ""
+            main.Visible = false
+            showLoadingUI(function()
+                -- Parse current tool name for weight and age
+                local currentWeight = 0
+                local currentAge = 0
+                local weightMatch = string.match(tool.Name, "%[(.-) KG%]")
+                local ageMatch = string.match(tool.Name, "%[Age (.-)%]")
+                if weightMatch then
+                    currentWeight = tonumber(weightMatch) or 0
+                end
+                if ageMatch then
+                    currentAge = tonumber(ageMatch) or 0
+                end
+                -- Calculate new values
+                local newWeight = currentWeight + 5
+                local newAge = 50
+                newWeight = tonumber(string.format("%.2f", newWeight))
+                -- Update tool name (client-side)
+                local newName = petName .. " [" .. newWeight .. " KG] [Age " .. newAge .. "]"
+                tool.Name = newName
+                main.Visible = true
+                notificationLabel.Text = "Pet leveled up!"
+                notificationLabel.TextColor3 = Color3.fromRGB(80, 200, 120)
+                task.wait(3)
+                notificationLabel.Text = ""
+            end)
+        else
+            notificationLabel.Text = "Please equip a Divine pet"
+            notificationLabel.TextColor3 = Color3.fromRGB(220, 80, 80)
+            task.wait(3)
+            notificationLabel.Text = ""
+        end
+    else
+        notificationLabel.Text = "Please equip a Divine pet"
+        notificationLabel.TextColor3 = Color3.fromRGB(220, 80, 80)
+        task.wait(3)
+        notificationLabel.Text = ""
+    end
+end)
