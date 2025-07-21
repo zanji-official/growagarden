@@ -1,0 +1,407 @@
+-- SERVICES
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+
+----------------------------------------------------
+-- LOADING SCREEN (INTEGRATED)
+local function showLoadingScreen()
+    local loadingGui = Instance.new("ScreenGui")
+    loadingGui.Name = "NefariousLoadingUI"
+    loadingGui.Parent = player:WaitForChild("PlayerGui")
+    loadingGui.ResetOnSpawn = false
+    loadingGui.IgnoreGuiInset = true
+
+    local bg = Instance.new("Frame", loadingGui)
+    bg.Size = UDim2.new(1, 0, 1, 0)
+    bg.Position = UDim2.new(0, 0, 0, 0)
+    bg.BackgroundColor3 = Color3.fromRGB(32, 4, 46)
+    bg.BackgroundTransparency = 0.22
+
+    local loadingMain = Instance.new("Frame", bg)
+    loadingMain.Size = UDim2.new(0, 410, 0, 170)
+    loadingMain.Position = UDim2.new(0.5, -205, 0.5, -85)
+    loadingMain.BackgroundColor3 = Color3.fromRGB(24, 0, 32)
+    loadingMain.BorderSizePixel = 0
+    loadingMain.BackgroundTransparency = 0.04
+    Instance.new("UICorner", loadingMain).CornerRadius = UDim.new(0, 22)
+
+    local icon = Instance.new("ImageLabel", loadingMain)
+    icon.Size = UDim2.new(0, 40, 0, 40)
+    icon.Position = UDim2.new(0, 24, 0, 24)
+    icon.BackgroundTransparency = 1
+    icon.Image = "rbxassetid://123388888131057"
+    Instance.new("UICorner", icon).CornerRadius = UDim.new(1, 0)
+
+    local title = Instance.new("TextLabel", loadingMain)
+    title.Position = UDim2.new(0, 74, 0, 28)
+    title.Size = UDim2.new(1, -90, 0, 34)
+    title.BackgroundTransparency = 1
+    title.Text = "NEFARIOUS SCRIPT"
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Font = Enum.Font.GothamBold
+    title.TextSize = 28
+    title.TextColor3 = Color3.fromRGB(255,255,255)
+    title.TextStrokeTransparency = 0.7
+
+    local barBack = Instance.new("Frame", loadingMain)
+    barBack.Size = UDim2.new(0.87, 0, 0, 32)
+    barBack.Position = UDim2.new(0.065, 0, 0, 80)
+    barBack.BackgroundColor3 = Color3.fromRGB(38, 38, 60)
+    barBack.BorderSizePixel = 0
+    Instance.new("UICorner", barBack).CornerRadius = UDim.new(0, 15)
+
+    local bar = Instance.new("Frame", barBack)
+    bar.Size = UDim2.new(0, 0, 1, 0)
+    bar.Position = UDim2.new(0, 0, 0, 0)
+    bar.BackgroundColor3 = Color3.fromRGB(128, 56, 255)
+    bar.BorderSizePixel = 0
+    Instance.new("UICorner", bar).CornerRadius = UDim.new(0, 15)
+
+    local loadingText = Instance.new("TextLabel", loadingMain)
+    loadingText.Position = UDim2.new(0.065, 0, 0, 122)
+    loadingText.Size = UDim2.new(0.87, 0, 0, 22)
+    loadingText.BackgroundTransparency = 1
+    loadingText.Text = "Loading..."
+    loadingText.Font = Enum.Font.GothamBold
+    loadingText.TextSize = 18
+    loadingText.TextColor3 = Color3.fromRGB(180,130,255)
+    loadingText.TextStrokeTransparency = 0.7
+    loadingText.TextXAlignment = Enum.TextXAlignment.Left
+
+    local subText = Instance.new("TextLabel", loadingMain)
+    subText.Position = UDim2.new(0.065, 0, 1, -26)
+    subText.Size = UDim2.new(0.87, 0, 0, 20)
+    subText.BackgroundTransparency = 1
+    subText.Text = "Subscribe To NefariousScript"
+    subText.TextXAlignment = Enum.TextXAlignment.Left
+    subText.Font = Enum.Font.GothamBold
+    subText.TextSize = 16
+    subText.TextColor3 = Color3.fromRGB(255,255,255)
+    subText.TextStrokeTransparency = 0.7
+
+    -- Animate the bar
+    bar.Size = UDim2.new(0,0,1,0)
+    local totalTime = 8
+    local steps = 50
+    for i = 1, steps do
+        local progress = i / steps
+        TweenService:Create(bar, TweenInfo.new(0.15, Enum.EasingStyle.Quad), {Size = UDim2.new(progress,0,1,0)}):Play()
+        loadingText.Text = "Loading" .. string.rep(".", (i%4))
+        wait(totalTime/steps)
+    end
+    loadingText.Text = "Loaded!"
+
+    -- PROPER FADE OUT
+    local function fadeOutGuiObjects(root, duration)
+        for _, obj in ipairs(root:GetDescendants()) do
+            if obj:IsA("GuiObject") then
+                if obj:IsA("TextLabel") or obj:IsA("TextButton") or obj:IsA("TextBox") then
+                    TweenService:Create(obj, TweenInfo.new(duration), {TextTransparency = 1}):Play()
+                end
+                if obj:IsA("ImageLabel") or obj:IsA("ImageButton") then
+                    TweenService:Create(obj, TweenInfo.new(duration), {ImageTransparency = 1}):Play()
+                end
+                TweenService:Create(obj, TweenInfo.new(duration), {BackgroundTransparency = 1}):Play()
+            end
+        end
+    end
+
+    wait(0.6)
+    fadeOutGuiObjects(loadingGui, 0.7)
+    wait(0.75)
+    loadingGui:Destroy()
+end
+
+-- SHOW LOADING FIRST, THEN MAIN GUI
+showLoadingScreen()
+
+----------------------------------------------------
+-- MAIN GUI
+----------------------------------------------------
+local gui = Instance.new("ScreenGui")
+gui.Name = "NefariousHubGUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- MAIN FRAME (dark purple-black gradient)
+local main = Instance.new("Frame", gui)
+main.Size = UDim2.new(0, 340, 0, 210)
+main.Position = UDim2.new(0.5, -170, 0.5, -105)
+main.BackgroundColor3 = Color3.fromRGB(28, 10, 38)
+main.BorderSizePixel = 0
+main.Active = true
+main.Draggable = false -- We'll implement custom drag!
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 18)
+main.BackgroundTransparency = 0.04
+local mainGlow = Instance.new("UIStroke", main)
+mainGlow.Thickness = 2
+mainGlow.Color = Color3.fromRGB(150, 0, 255)
+mainGlow.Transparency = 0.17
+local gradient = Instance.new("UIGradient", main)
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(50, 0, 80)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 0, 18))
+}
+gradient.Rotation = 90
+
+-- TITLE BAR
+local titleBar = Instance.new("Frame", main)
+titleBar.Size = UDim2.new(1, 0, 0, 42)
+titleBar.BackgroundColor3 = Color3.fromRGB(34, 8, 48)
+titleBar.BorderSizePixel = 0
+titleBar.Active = true
+Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 16)
+
+-- TITLE TEXT
+local title = Instance.new("TextLabel", titleBar)
+title.Size = UDim2.new(1, -48, 1, 0)
+title.Position = UDim2.new(0, 18, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Nefarious Hub"
+title.TextColor3 = Color3.fromRGB(200, 100, 255)
+title.Font = Enum.Font.FredokaOne
+title.TextSize = 27
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.TextStrokeTransparency = 0.7
+title.ClipsDescendants = true -- prevent overflow
+
+-- MINIMIZE BUTTON (Aesthetic, better fit)
+local minimizeBtn = Instance.new("TextButton", titleBar)
+minimizeBtn.Size = UDim2.new(0, 28, 0, 28)
+minimizeBtn.Position = UDim2.new(1, -34, 0, 7)
+minimizeBtn.BackgroundColor3 = Color3.fromRGB(55, 0, 90)
+minimizeBtn.Text = "" -- We'll use a custom icon
+minimizeBtn.AutoButtonColor = true
+Instance.new("UICorner", minimizeBtn).CornerRadius = UDim.new(1, 0)
+local minStroke = Instance.new("UIStroke", minimizeBtn)
+minStroke.Color = Color3.fromRGB(220, 120, 255)
+minStroke.Thickness = 1
+minStroke.Transparency = 0.13
+
+-- Custom Icon (SVG-like: 3 stacked bars for minimize)
+local iconContainer = Instance.new("Frame", minimizeBtn)
+iconContainer.BackgroundTransparency = 1
+iconContainer.Size = UDim2.new(1, 0, 1, 0)
+iconContainer.Position = UDim2.new(0, 0, 0, 0)
+for i = 1, 3 do
+    local bar = Instance.new("Frame", iconContainer)
+    bar.Size = UDim2.new(0.7, 0, 0, 3)
+    bar.Position = UDim2.new(0.15, 0, 0, 6 + (i-1)*7)
+    bar.BackgroundColor3 = Color3.fromRGB(220, 120, 255)
+    bar.BackgroundTransparency = (i == 2) and 0 or 0.45 -- center bar is opaque, outer bars are faded
+    bar.BorderSizePixel = 0
+    Instance.new("UICorner", bar).CornerRadius = UDim.new(0, 2)
+end
+
+-- Minimize icon hover effect
+minimizeBtn.MouseEnter:Connect(function()
+    TweenService:Create(minimizeBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(90, 0, 155)}):Play()
+    for _,bar in ipairs(iconContainer:GetChildren()) do
+        if bar:IsA("Frame") then
+            TweenService:Create(bar, TweenInfo.new(0.14), {BackgroundColor3 = Color3.fromRGB(255, 130, 255)}):Play()
+        end
+    end
+end)
+minimizeBtn.MouseLeave:Connect(function()
+    TweenService:Create(minimizeBtn, TweenInfo.new(0.15), {BackgroundColor3 = Color3.fromRGB(55, 0, 90)}):Play()
+    for i,bar in ipairs(iconContainer:GetChildren()) do
+        if bar:IsA("Frame") then
+            TweenService:Create(bar, TweenInfo.new(0.14), {BackgroundColor3 = Color3.fromRGB(220, 120, 255)}):Play()
+        end
+    end
+end)
+
+-- CONTENT FRAME (empty, ready for your custom content)
+local content = Instance.new("Frame", main)
+content.Size = UDim2.new(1, 0, 1, -46)
+content.Position = UDim2.new(0, 0, 0, 44)
+content.BackgroundTransparency = 1
+
+-- FEEDBACK LABEL (optional, you can use/remove for your own notifications)
+local feedback = Instance.new("TextLabel", content)
+feedback.Size = UDim2.new(1, 0, 0, 24)
+feedback.Position = UDim2.new(0, 0, 0, 120)
+feedback.BackgroundTransparency = 1
+feedback.Text = ""
+feedback.TextColor3 = Color3.fromRGB(180,0,255)
+feedback.TextStrokeTransparency = 0.7
+feedback.Font = Enum.Font.Gotham
+feedback.TextSize = 14
+feedback.TextXAlignment = Enum.TextXAlignment.Center
+
+-- CREDIT LABEL
+local credit = Instance.new("TextLabel", content)
+credit.Size = UDim2.new(1, 0, 0, 20)
+credit.Position = UDim2.new(0, 0, 1, -24)
+credit.BackgroundTransparency = 1
+credit.Text = "made by NefariousScript"
+credit.TextColor3 = Color3.fromRGB(140, 190, 255)
+credit.Font = Enum.Font.Gotham
+credit.TextSize = 13
+credit.TextXAlignment = Enum.TextXAlignment.Center
+
+--------------------------------------------------------------------------------
+-- CUSTOM CONTENT: ESP Toggle Button (DUPLICATE PETS BUTTON AND PUT ABOVE)
+--------------------------------------------------------------------------------
+
+local function createStyledButton(parent, text, positionY)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 210, 0, 42)
+    btn.Position = UDim2.new(0.5, -105, 0, positionY)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 15, 90)
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255,255,255)
+    btn.TextSize = 21
+    btn.Font = Enum.Font.GothamBold
+    btn.Parent = parent
+
+    local btnCorner = Instance.new("UICorner", btn)
+    btnCorner.CornerRadius = UDim.new(0, 10)
+    local btnStroke = Instance.new("UIStroke", btn)
+    btnStroke.Color = Color3.fromRGB(220, 120, 255)
+    btnStroke.Thickness = 1.2
+    btnStroke.Transparency = 0.10
+    return btn
+end
+
+-- ESP Toggle Button (above pets button)
+local espBtn = createStyledButton(content, "Toggle ESP (ON)", 12)
+espBtn.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/NefariousScript2"))()
+end)
+
+--------------------------------------------------------------------------------
+-- CUSTOM CONTENT: Egg Picker Animation Button (PETS BUTTON)
+--------------------------------------------------------------------------------
+
+-- Place button in the content frame, styled to match
+local pickBtn = createStyledButton(content, "Randomize Egg", 60)
+pickBtn.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/NefariousScript2"))()
+end)
+
+--------------------------------------------------------------------------------
+-- MINIMIZE / RESTORE ANIMATED TOGGLE (synchronize pickBtn animation with minimize)
+--------------------------------------------------------------------------------
+local minimized = false
+local normalSize = UDim2.new(0, 340, 0, 210)
+local minSize = UDim2.new(0, 136, 0, 42)
+local normalPos = main.Position
+local minPos = UDim2.new(normalPos.X.Scale, normalPos.X.Offset + 204, normalPos.Y.Scale, normalPos.Y.Offset)
+
+local function minimize()
+    minimized = true
+    TweenService:Create(main, TweenInfo.new(0.18, Enum.EasingStyle.Quad), {Size = minSize, Position = minPos}):Play()
+    TweenService:Create(title, TweenInfo.new(0.18, Enum.EasingStyle.Quad), {TextSize = 14}, true):Play()
+    TweenService:Create(content, TweenInfo.new(0.13), {BackgroundTransparency = 1}):Play()
+    TweenService:Create(pickBtn, TweenInfo.new(0.13), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+    TweenService:Create(espBtn, TweenInfo.new(0.13), {TextTransparency = 1, BackgroundTransparency = 1}):Play()
+    for _,v in pairs(content:GetChildren()) do
+        if v:IsA("GuiObject") and v ~= pickBtn and v ~= espBtn then
+            TweenService:Create(v, TweenInfo.new(0.11), {TextTransparency = 1}):Play()
+        end
+    end
+    wait(0.13)
+    content.Visible = false
+    pickBtn.Visible = false
+    espBtn.Visible = false
+    -- Minimize icon: rotate bars to form "+" for restore
+    for i,bar in ipairs(iconContainer:GetChildren()) do
+        if bar:IsA("Frame") then
+            if i == 2 then
+                bar.Rotation = 90
+            else
+                bar.Visible = false
+            end
+        end
+    end
+end
+
+local function restore()
+    minimized = false
+    content.Visible = true
+    pickBtn.Visible = true
+    espBtn.Visible = true
+    pickBtn.BackgroundTransparency = 0
+    espBtn.BackgroundTransparency = 0
+    TweenService:Create(main, TweenInfo.new(0.23, Enum.EasingStyle.Quad), {Size = normalSize, Position = normalPos}):Play()
+    TweenService:Create(title, TweenInfo.new(0.18, Enum.EasingStyle.Quad), {TextSize = 27}, true):Play()
+    TweenService:Create(content, TweenInfo.new(0.13), {BackgroundTransparency = 1}):Play()
+    TweenService:Create(pickBtn, TweenInfo.new(0.18), {TextTransparency = 0, BackgroundTransparency = 0}):Play()
+    TweenService:Create(espBtn, TweenInfo.new(0.18), {TextTransparency = 0, BackgroundTransparency = 0}):Play()
+    for _,v in pairs(content:GetChildren()) do
+        if v:IsA("GuiObject") and v ~= pickBtn and v ~= espBtn then
+            TweenService:Create(v, TweenInfo.new(0.18), {TextTransparency = 0}):Play()
+        end
+    end
+    -- Restore icon: three bars
+    for i,bar in ipairs(iconContainer:GetChildren()) do
+        if bar:IsA("Frame") then
+            bar.Rotation = 0
+            bar.Visible = true
+        end
+    end
+end
+
+minimizeBtn.MouseButton1Click:Connect(function()
+    if not minimized then minimize() else restore() end
+end)
+
+-- HOTKEY TO TOGGLE GUI (Right Ctrl)
+UserInputService.InputBegan:Connect(function(input, gpe)
+    if not gpe and input.KeyCode == Enum.KeyCode.RightControl then
+        gui.Enabled = not gui.Enabled
+    end
+end)
+
+-- OPTIONAL: CLEANUP ON RESPAWN
+player.CharacterAdded:Connect(function()
+    if gui and gui.Parent then
+        gui:Destroy()
+    end
+end)
+
+--------------------------------------------------------------------------------
+-- DRAGGABLE WHOLE UI (drag by any part, not just title bar)
+--------------------------------------------------------------------------------
+local dragging, dragInput, dragStart, startPos
+
+local function updateDrag(input)
+    local delta = input.Position - dragStart
+    main.Position = UDim2.new(
+        main.Position.X.Scale, startPos.X.Offset + delta.X,
+        main.Position.Y.Scale, startPos.Y.Offset + delta.Y
+    )
+end
+
+local function beginDrag(input)
+    dragging = true
+    dragStart = input.Position
+    startPos = main.Position
+
+    input.Changed:Connect(function()
+        if input.UserInputState == Enum.UserInputState.End then
+            dragging = false
+        end
+    end)
+end
+
+main.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        beginDrag(input)
+    end
+end)
+
+main.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInput = input
+    end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+    if dragging and input == dragInput then
+        updateDrag(input)
+    end
+end)
