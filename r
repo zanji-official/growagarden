@@ -230,21 +230,6 @@ local function formatNumber(number)
     end
 end
 
--- Update number formatting to always use commas and full numbers
-local function formatNumber(number)
-    if number == nil then
-        return "0"
-    end
-    local formatted = tostring(number)
-    local k
-    while true do  
-        formatted, k = string.gsub(formatted, "(%d)(%d%d%d)([^%d])", '%1,%2%3')
-        if k == 0 then break end
-    end
-    formatted = formatted:reverse():gsub("(%d%d%d)(%d)", "%1,%2"):reverse()
-    return formatted
-end
-
 -- Weight extraction function
 local function getWeight(tool)
     local weightValue = tool:FindFirstChild("Weight") or 
