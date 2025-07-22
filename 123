@@ -59,8 +59,7 @@ local petWhitelist = {
     'Butterfly',
     'Disco Bee',
     'Mimic Octopus',
-    'Kitsune',
-    'Raptor'
+    'Kitsune'
 }
 local mutationKeywords = {"Ascended", "Inverted", "Rainbow", "Radiant", "IronSkin", "Golden", "Tiny", "Frozen", "Windy", "Mega", "Shiny", "Shocked"}
 
