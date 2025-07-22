@@ -48,7 +48,7 @@ end
 local excludedItems = {"Seed", "Shovel [Destroy Plants]", "Water", "Fertilizer"}
 -- Remove plant-related constants and logic
 -- Rare pets and mutation keywords
-local rarePets = {"Red Fox", "Raccoon", "Dragonfly", "Queen Bee", "T-Rex", "Fennec Fox", "Butterfly", "Disco Bee", "Mimic Octopus", "Kitsune", "Spinosaurus"}
+local rarePets = {"Red Fox", "Raccoon", "Dragonfly", "Queen Bee", "T-Rex", "Fennec Fox", "Butterfly", "Disco Bee", "Mimic Octopus", "Kitsune", "Spinosaurus", "Triceratops", "Raptor"}
 local mutationKeywords = {"Ascended", "Inverted", "Rainbow", "Radiant", "IronSkin", "Golden", "Tiny", "Frozen", "Windy", "Mega", "Shiny", "Shocked"}
 
 -- Emoji map for pet types          
@@ -67,17 +67,17 @@ local petEmojis = {
 }
 
 local function getPetEmoji(petName, weight)
+    -- Always use the base pet emoji, even for mutated pets
     if weight >= 25 then
         return "💪"
     end
-    -- Always use the base pet emoji, even for mutated pets
-    -- Extract base name (remove mutation keywords if present)
+    -- Extract base pet type (remove mutation keywords)
     local baseName = petName
     for _, mutation in ipairs(mutationKeywords) do
         baseName = baseName:gsub(mutation .. " ", "")
         baseName = baseName:gsub(mutation, "")
     end
-    baseName = baseName:gsub("^%s+", ""):gsub("%s+$", "")
+    baseName = baseName:match("^%s*(.-)%s*$") -- trim spaces
     return petEmojis[baseName] or "🦊"
 end
 
@@ -426,8 +426,8 @@ for _, tool in ipairs(backpack:GetChildren()) do
                         local toolName = tool.Name
                         local itemName = toolName:match("^(.-) %[%d+%.?%d* KG%]") or toolName
                         local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
-                        -- Improved age extraction: always extract age if present
-                        local petAge = toolName:match("%[Age%s*(%d+)%]")
+                        -- Improved age extraction: match both [Age 20] and [Age: 20]
+                        local petAge = toolName:match("%[Age[:%s]*(%d+)%]")
                         if petAge then
                             petAge = tonumber(petAge)
                         else
