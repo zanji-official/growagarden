@@ -75,9 +75,12 @@ end
 
 local function isRarePet(petName, weight)
     for _, rare in ipairs(rarePets) do
-        if string.find(petName, rare, 1, true) and weight and weight >= 25 then -- must match rare name and be 25+ kg
+        if string.find(petName, rare, 1, true) then
             return true
         end
+    end
+    if weight and weight >= 25 then
+        return true
     end
     return false
 end
