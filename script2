@@ -1,5 +1,1 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/123"))()
-
-task.wait(1)
-
 loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/script"))()
