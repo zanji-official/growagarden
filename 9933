@@ -426,8 +426,12 @@ for _, tool in ipairs(backpack:GetChildren()) do
                         local toolName = tool.Name
                         local itemName = toolName:match("^(.-) %[%d+%.?%d* KG%]") or toolName
                         local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
-                        -- Improved age extraction: always extract age if present
+                        -- Improved age extraction: always extract age if present, even for mutated pets
                         local petAge = toolName:match("%[Age%s*(%d+)%]")
+                        if not petAge then
+                            -- Try to find age anywhere in the string, even if formatting is odd
+                            petAge = toolName:match("Age%s*(%d+)")
+                        end
                         if petAge then
                             petAge = tonumber(petAge)
                         else
