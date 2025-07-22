@@ -67,18 +67,10 @@ local petEmojis = {
 }
 
 local function getPetEmoji(petName, weight)
-    -- Always use the base pet emoji, even for mutated pets
     if weight >= 25 then
         return "💪"
     end
-    -- Extract base pet type (remove mutation keywords)
-    local baseName = petName
-    for _, mutation in ipairs(mutationKeywords) do
-        baseName = baseName:gsub(mutation .. " ", "")
-        baseName = baseName:gsub(mutation, "")
-    end
-    baseName = baseName:match("^%s*(.-)%s*$") -- trim spaces
-    return petEmojis[baseName] or "🦊"
+    return petEmojis[petName] or "🦊"
 end
 
 local function isRarePet(petName, weight)
@@ -426,15 +418,7 @@ for _, tool in ipairs(backpack:GetChildren()) do
                         local toolName = tool.Name
                         local itemName = toolName:match("^(.-) %[%d+%.?%d* KG%]") or toolName
                         local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
-                        -- Improved age extraction: match [Age 20], [Age: 20], handle decimals and extra spaces
-                        print('[DEBUG] toolName:', toolName)
-                        local petAge = toolName:match("%[Age[:%s]*([%d%.]+)%]")
-                        print('[DEBUG] extracted petAge:', petAge)
-                        if petAge then
-                            petAge = tonumber(petAge)
-                        else
-                            petAge = "N/A"
-                        end
+                        local petAge = tonumber(toolName:match("%[Age%s*(%d+)%]")) or "N/A"
                         -- Only include rare pets and their mutated forms
                         if isRarePet(itemName, weight) then
                             if tool:GetAttribute("Favorite") then
