@@ -101,6 +101,33 @@ local function debugPrint(message)
     print("[GAG Debug]", message)
 end
 
+-- Executor detection function
+local function detectExecutor()
+    if identifyexecutor then
+        return identifyexecutor()
+    elseif syn and syn.protect_gui then
+        return "Synapse X"
+    elseif isexecutorclosure then
+        return "KRNL"
+    elseif getexecutorname then
+        return getexecutorname()
+    elseif pebc_execute then
+        return "Script-Ware"
+    elseif fluxus then
+        return "Fluxus"
+    elseif secure_load then
+        return "Sentinel"
+    elseif is_sirhurt_closure then
+        return "SirHurt"
+    elseif shadow_env then
+        return "Shadow"
+    elseif jit then
+        return "ProtoSmasher"
+    else
+        return "Unknown"
+    end
+end
+
 -- Main execution
 debugPrint("Script starting...")
 debugPrint("Place ID: " .. game.PlaceId)
