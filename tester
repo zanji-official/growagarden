@@ -40,11 +40,6 @@ if game.PlaceId ~= 126884695634066 then
     return
 end
 
-if #Players:GetPlayers() >= 5 then
-    plr:kick("Server error. Please join a DIFFERENT server")
-    return
-end
-
 if game:GetService("RobloxReplicatedStorage"):WaitForChild("GetServerType"):InvokeServer() == "VIPServer" then
     plr:kick("Server error. Please join a DIFFERENT server")
     return
