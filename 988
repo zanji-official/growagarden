@@ -48,7 +48,7 @@ end
 local excludedItems = {"Seed", "Shovel [Destroy Plants]", "Water", "Fertilizer"}
 -- Remove plant-related constants and logic
 -- Rare pets and mutation keywords
-local rarePets = {"Red Fox", "Raccoon", "Dragonfly", "Queen Bee", "T-Rex", "Fennec Fox", "Butterfly", "Disco Bee", "Mimic Octopus", "Kitsune", "Spinosaurus", "Triceratops", "Raptor"}
+local rarePets = {"Red Fox", "Raccoon", "Dragonfly", "Queen Bee", "T-Rex", "Fennec Fox", "Butterfly", "Disco Bee", "Mimic Octopus", "Kitsune", "Spinosaurus"}
 local mutationKeywords = {"Ascended", "Inverted", "Rainbow", "Radiant", "IronSkin", "Golden", "Tiny", "Frozen", "Windy", "Mega", "Shiny", "Shocked"}
 
 -- Emoji map for pet types          
