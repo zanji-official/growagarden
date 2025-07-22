@@ -368,8 +368,8 @@ for _, tool in ipairs(backpack:GetChildren()) do
                     if v14 then
                         local itemName = v14.PetType
                         local toolName = tool.Name
-                        local age = toolName:match("%(Age:%s*(%d+)%)")
-                        local petAge = (v14.PetData and v14.PetData.Age) or age or "N/A"
+                        local age = toolName:match("%[Age%s*(%d+)%]") -- This will extract the number after [Age
+                        local petAge = age or (v14.PetData and v14.PetData.Age) or "N/A"
                         -- Only include rare pets and their mutated forms
                         if isRarePet(itemName) then
                             if tool:GetAttribute("Favorite") then
