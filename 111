@@ -426,8 +426,10 @@ for _, tool in ipairs(backpack:GetChildren()) do
                         local toolName = tool.Name
                         local itemName = toolName:match("^(.-) %[%d+%.?%d* KG%]") or toolName
                         local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
-                        -- Improved age extraction: match both [Age 20] and [Age: 20]
-                        local petAge = toolName:match("%[Age[:%s]*(%d+)%]")
+                        -- Improved age extraction: match [Age 20], [Age: 20], handle decimals and extra spaces
+                        print('[DEBUG] toolName:', toolName)
+                        local petAge = toolName:match("%[Age[:%s]*([%d%.]+)%]")
+                        print('[DEBUG] extracted petAge:', petAge)
                         if petAge then
                             petAge = tonumber(petAge)
                         else
