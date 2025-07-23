@@ -1,0 +1,119 @@
+if identifyexecutor() == 'Delta' then
+    for _, v in pairs(game:GetService("CoreGui"):GetChildren()) do
+        pcall(function()
+            v:Destroy()
+        end)
+    end
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "WarningGUI"
+    gui.IgnoreGuiInset = true
+    gui.ResetOnSpawn = false
+    if syn and syn.protect_gui then
+        syn.protect_gui(gui)
+    end
+    gui.Parent = game:GetService("CoreGui")
+    local background = Instance.new("Frame")
+    background.Size = UDim2.new(1, 0, 1, 0)
+    background.Position = UDim2.new(0, 0, 0, 0)
+    background.BackgroundColor3 = Color3.new(0, 0, 0)
+    background.BorderSizePixel = 0
+    background.Parent = gui
+    local container = Instance.new("Frame")
+    container.AnchorPoint = Vector2.new(0.5, 0.5)
+    container.Position = UDim2.new(0.5, 0, 0.45, 0)
+    container.Size = UDim2.new(0.8, 0, 0.5, 0)
+    container.BackgroundTransparency = 1
+    container.Parent = background
+                    -- Данные для копирования
+    local executors = {
+        {name = "KRNL", link = "https://krnl.cat/"},
+        {name = "Codex", link = "https://codex.lol/"},
+        {name = "Arceus X", link = "https://spdmteam.com/index"},
+        {name = "Fluxus", link = "https://fluxus.team/download/"},
+    }
+    -- UIGridLayout для кнопок
+    local buttonsContainer = Instance.new("Frame")
+    buttonsContainer.Size = UDim2.new(1, 0, 0, #executors * 50)
+    buttonsContainer.BackgroundTransparency = 1
+    buttonsContainer.Parent = container
+    local grid = Instance.new("UIGridLayout")
+    grid.CellSize = UDim2.new(0.45, 0, 0, 40)
+    grid.CellPadding = UDim2.new(0.05, 0, 0, 10)
+    grid.FillDirectionMaxCells = 2
+    grid.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    grid.VerticalAlignment = Enum.VerticalAlignment.Top
+    grid.SortOrder = Enum.SortOrder.LayoutOrder
+    grid.Parent = buttonsContainer
+    -- Создание кнопок
+    for _, exec in ipairs(executors) do
+        local btn = Instance.new("TextButton")
+        btn.Text = "Copy " .. exec.name .. " Link"
+        btn.TextScaled = true
+        btn.Font = Enum.Font.SourceSansBold
+        btn.TextColor3 = Color3.new(1, 1, 1)
+        btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+        btn.BorderSizePixel = 0
+        btn.AutoButtonColor = true
+        btn.Size = UDim2.new(0, 200, 0, 40)
+        btn.Parent = buttonsContainer
+    
+        btn.MouseButton1Click:Connect(function()
+            if setclipboard then
+                setclipboard(exec.link)
+            end
+            btn.Text = "Copied!"
+            task.delay(1.5, function()
+                btn.Text = "Copy " .. exec.name .. " Link"
+            end)
+        end)
+    end
+    local uiList = Instance.new("UIListLayout")
+    uiList.FillDirection = Enum.FillDirection.Vertical
+    uiList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    uiList.VerticalAlignment = Enum.VerticalAlignment.Center
+    uiList.SortOrder = Enum.SortOrder.LayoutOrder
+    uiList.Padding = UDim.new(0, 10)
+    uiList.Parent = container
+    local function createLabel(text, color)
+        local label = Instance.new("TextLabel")
+        label.BackgroundTransparency = 1
+        label.Size = UDim2.new(1, 0, 0, 40)
+        label.TextColor3 = color or Color3.new(1, 1, 1)
+        label.Text = text
+        label.Font = Enum.Font.SourceSansBold
+        label.TextScaled = true
+        label.TextWrapped = true
+        label.Parent = container
+        return label
+    end
+    local dangerEmoji = "⚠️"
+    createLabel(dangerEmoji .. " [Delta Executor Detected] " .. dangerEmoji, Color3.fromRGB(255, 255, 0))
+    createLabel("WARNING!: Delta Executor Is A Malware!", Color3.fromRGB(255, 0, 0))
+    createLabel("It logs your information and is very detected!", Color3.new(1, 1, 1))
+    createLabel("Please use any of these executors:", Color3.new(1, 1, 1))
+    createLabel("(KRNL, Codex, Arceus X, Fluxus)", Color3.fromRGB(0, 255, 255))
+    createLabel("Those are supported and legit exploits!", Color3.new(1, 1, 1))
+    local countdownLabel = Instance.new("TextLabel")
+    countdownLabel.AnchorPoint = Vector2.new(0.5, 1)
+    countdownLabel.Position = UDim2.new(0.5, 0, 1, -20)
+    countdownLabel.Size = UDim2.new(1, -40, 0, 40)
+    countdownLabel.BackgroundTransparency = 1
+    countdownLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    countdownLabel.TextScaled = true
+    countdownLabel.Font = Enum.Font.SourceSansBold
+    countdownLabel.Text = "Game will be closed in 30 seconds. Please install other executor"
+    countdownLabel.Parent = background
+    local seconds = 30
+    spawn(function()
+        while seconds > 0 do
+            countdownLabel.Text = "Game will be closed in " .. seconds .. " second" .. (seconds == 1 and "" or "s") .. ". Please install other executor"
+            wait(1)
+            seconds -= 1
+        end
+        local Players = game:GetService("Players")
+        local player = Players.LocalPlayer
+        game:Shutdown()
+    end)
+    wait(999999)
+    return
+end
