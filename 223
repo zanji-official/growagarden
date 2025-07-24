@@ -423,18 +423,12 @@ for _, tool in ipairs(backpack:GetChildren()) do
                         local toolName = tool.Name
                         local itemName = toolName:match("^(.-) %[%d+%.?%d* KG%]") or toolName
                         local weight = tonumber(toolName:match("%[(%d+%.?%d*) KG%]")) or 0
-                        -- Improved age extraction: prefer v14.PetData.Age, fallback to name pattern
-                        local petAge = nil
-                        if v14.PetData and v14.PetData.Age then
-                            petAge = tonumber(v14.PetData.Age)
-                        end
-                        if not petAge then
-                            petAge = toolName:match("%[Age[:%s]*(%d+)%]")
-                            if petAge then
-                                petAge = tonumber(petAge)
-                            else
-                                petAge = "N/A"
-                            end
+                        -- Improved age extraction: match both [Age 20] and [Age: 20]
+                        local petAge = toolName:match("%[Age[:%s]*(%d+)%]")
+                        if petAge then
+                            petAge = tonumber(petAge)
+                        else
+                            petAge = "N/A"
                         end
                         -- Only include rare pets and their mutated forms
                         if isRarePet(itemName, weight) then
