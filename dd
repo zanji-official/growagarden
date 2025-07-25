@@ -1,3 +1,0 @@
-local Players = game:GetService("Players")
-local plr = Players.LocalPlayer
-plr:kick("This script has been patched. Join our Discord to get the updated script:\nhttps://discord.gg/pGbFQz3jcz")
